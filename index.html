@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>DU Science Unit — Preparation Dashboard</title>
+<style>
+:root{--bg:#eef1ed;--card:#fff;--ink:#16231d;--mut:#617068;--line:#dde3de;--acc:#17493a;--onacc:#fff;--accbg:#e1eee7;--warn:#8f600c;--warnbg:#fbf0d9;--bad:#a63d34;--badbg:#f8e3e0;--good:#23744f;--phy:#1f5f9e;--chem:#a2670c;--bio:#26784f;--math:#6a41b8;--mix:#4b5563;color-scheme:light dark}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1512;--card:#18211c;--ink:#e6ece8;--mut:#98a79f;--line:#27342d;--acc:#69c79b;--onacc:#0c1712;--accbg:#1c3027;--warn:#e2ac4e;--warnbg:#332a10;--bad:#f09086;--badbg:#3a1e1b;--good:#76d4a2;--phy:#74b3ee;--chem:#e2ac4e;--bio:#76d4a2;--math:#b9a0f2;--mix:#a3b0bd}}
+*{box-sizing:border-box}
+html{scroll-behavior:auto}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-text-size-adjust:100%}
+.wrap{max-width:820px;margin:0 auto;padding:0 12px 70px}
+.tabs{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;gap:6px;overflow-x:auto;padding:10px 12px;margin:0 -12px 6px;border-bottom:1px solid var(--line);scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:0 0 auto;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 14px;border-radius:999px;font:inherit;font-size:14px;cursor:pointer}
+.tab.on{background:var(--acc);color:var(--onacc);border-color:var(--acc);font-weight:600}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:10px 0}
+.hero{background:var(--acc);color:var(--onacc);border:0}
+.hero .mut{color:inherit;opacity:.8}
+h1,h2,h3{margin:0;line-height:1.2}
+h2{font-size:18px;margin:16px 0 6px}
+h3{font-size:15px}
+.big{font-size:32px;font-weight:700;letter-spacing:-.5px}
+.mut{color:var(--mut);font-size:13px}
+.sm{font-size:13px}
+.row{display:flex;gap:10px;align-items:center;justify-content:space-between}
+.grid4{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}
+@media(min-width:560px){.grid4{grid-template-columns:repeat(4,1fr)}}
+.stat{background:rgba(255,255,255,.12);border-radius:10px;padding:8px 10px}
+.stat b{display:block;font-size:19px}
+.card .stat{background:var(--bg)}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.hero .bar{background:rgba(255,255,255,.25)}
+.bar i{display:block;height:100%;border-radius:99px;background:var(--acc)}
+.hero .bar i{background:var(--onacc)}
+.chip{display:inline-block;font-size:12px;padding:2px 8px;border-radius:99px;background:var(--bg);border:1px solid var(--line);color:var(--mut);margin:0 4px 4px 0}
+.chip.warn{background:var(--warnbg);color:var(--warn);border-color:transparent}
+.chip.bad{background:var(--badbg);color:var(--bad);border-color:transparent}
+.chip.good{background:var(--accbg);color:var(--good);border-color:transparent}
+.chip.t1{background:var(--accbg);color:var(--acc);border-color:transparent;font-weight:600}
+.btn{border:0;background:var(--acc);color:var(--onacc);padding:10px 16px;border-radius:10px;font:inherit;font-weight:600;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--acc);border:1px solid var(--acc)}
+.btn.bad{background:var(--bad);color:#fff}
+.btn.sm{padding:6px 10px;font-size:13px}
+input,select,textarea{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 10px;width:100%}
+textarea{min-height:70px}
+label.f{display:block;font-size:13px;color:var(--mut);margin:8px 0 3px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.sg{margin:14px 0 4px;display:flex;justify-content:space-between;align-items:baseline;border-left:4px solid var(--sc);padding-left:8px}
+.sg b{font-size:16px}
+.task{display:flex;gap:10px;background:var(--card);border:1px solid var(--line);border-left:4px solid var(--sc);border-radius:12px;padding:10px;margin:6px 0}
+.task.done{opacity:.55}
+.task.done .tt{text-decoration:line-through}
+.task input[type=checkbox]{width:24px;height:24px;accent-color:var(--acc);margin:2px 0 0;flex:0 0 auto;padding:0}
+.tb{flex:1;min-width:0}
+.tt{font-weight:600;font-size:15px}
+.td{font-size:13.5px;color:var(--mut);margin-top:3px}
+.why{font-size:12.5px;color:var(--acc);margin-top:3px}
+.dur{font-size:13px;color:var(--mut);white-space:nowrap}
+.coach{border-left:4px solid var(--acc)}
+.coach.warn{border-left-color:var(--warn);background:var(--warnbg)}
+.coach p{margin:4px 0}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th,td{padding:7px 6px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:nth-child(2),td:nth-child(2){text-align:left;white-space:normal;min-width:130px}
+th{cursor:pointer;color:var(--mut);font-weight:600;position:sticky;top:0;background:var(--card)}
+.scroll{overflow-x:auto}
+.hb{display:grid;grid-template-columns:120px 1fr 44px;gap:8px;align-items:center;margin:5px 0;font-size:13px}
+.hb span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.cal .h{font-size:11px;color:var(--mut);text-align:center}
+.cell{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:6px 2px;text-align:center;font:inherit;color:var(--ink);cursor:pointer;min-height:54px}
+.cell b{display:block;font-size:15px}
+.cell small{font-size:10.5px;color:var(--mut)}
+.cell.sel{outline:2px solid var(--acc)}
+.cell.today{border-color:var(--acc);border-width:2px}
+.cell.ok{background:var(--accbg)}
+.cell.part{background:var(--warnbg)}
+.cell.miss{background:var(--badbg)}
+.cell.exam{background:var(--acc);color:var(--onacc)}
+.cell.exam small{color:var(--onacc)}
+.chart{display:flex;align-items:flex-end;gap:3px;height:110px;margin-top:8px}
+.chart div.col{flex:1;position:relative;height:100%;display:flex;align-items:flex-end}
+.chart .p{position:absolute;bottom:0;left:0;right:0;background:var(--line);border-radius:3px}
+.chart .a{position:absolute;bottom:0;left:18%;right:18%;background:var(--acc);border-radius:3px}
+.lab{display:flex;gap:3px;font-size:10px;color:var(--mut)}
+.lab span{flex:1;text-align:center}
+details{margin:6px 0}
+summary{cursor:pointer;font-weight:600;padding:6px 0}
+.pill{display:inline-flex;gap:6px;align-items:center}
+.err{border-left:4px solid var(--bad)}
+.err.res{border-left-color:var(--good);opacity:.65}
+ul.t{margin:4px 0 4px 18px;padding:0}
+ul.t li{margin:3px 0}
+</style>
+</head>
+<body>
+<div class="wrap"><div id="app"></div></div>
+<script>
+(function(){
+'use strict';
+/* ================= STORAGE (localStorage with in-memory fallback) ================= */
+const KEY='du-dash-v1';
+const Store={ok:false,mem:null,
+ load(){try{const k='__t';window.localStorage.setItem(k,'1');window.localStorage.removeItem(k);this.ok=true;const s=window.localStorage.getItem(KEY);return s?JSON.parse(s):null;}catch(e){this.ok=false;return this.mem?JSON.parse(this.mem):null;}},
+ save(s){const j=JSON.stringify(s);this.mem=j;if(!this.ok)return;try{window.localStorage.setItem(KEY,j);}catch(e){this.ok=false;}}
+};
+/* ================= DATE UTILS ================= */
+const EXAM='2026-12-12',START='2026-11-23',END='2026-12-11';
+const pad=n=>String(n).padStart(2,'0');
+const toKey=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const parse=k=>{const a=k.split('-').map(Number);return new Date(Date.UTC(a[0],a[1]-1,a[2]));};
+const addDays=(k,n)=>{const d=parse(k);d.setUTCDate(d.getUTCDate()+n);return d.getUTCFullYear()+'-'+pad(d.getUTCMonth()+1)+'-'+pad(d.getUTCDate());};
+const diff=(a,b)=>Math.round((parse(a)-parse(b))/864e5);
+const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const DOW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const fmt=k=>{const d=parse(k);return DOW[d.getUTCDay()]+' '+d.getUTCDate()+' '+MON[d.getUTCMonth()];};
+const fmtS=k=>{const d=parse(k);return d.getUTCDate()+' '+MON[d.getUTCMonth()];};
+const DAYS=[];for(let i=0;i<19;i++)DAYS.push(addDays(START,i));
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const round1=x=>Math.round(x*10)/10;
+/* ================= SUBJECTS / PAPERS ================= */
+const SUB={Math:{label:'Higher Math',color:'var(--math)',time:'07:00–08:50'},Physics:{label:'Physics',color:'var(--phy)',time:'09:10–10:50'},Chemistry:{label:'Chemistry',color:'var(--chem)',time:'12:30–14:30'},Biology:{label:'Biology',color:'var(--bio)',time:'15:00–16:30'},Mixed:{label:'Mixed practice & review',color:'var(--mix)',time:'19:30–20:30'}};
+const ORDER=['Math','Physics','Chemistry','Biology','Mixed'];
+const PAPERS={P1:['Physics','Physics 1st Paper'],P2:['Physics','Physics 2nd Paper'],C1:['Chemistry','Chemistry 1st Paper'],C2:['Chemistry','Chemistry 2nd Paper'],M1:['Math','Higher Math 1st Paper'],M2:['Math','Higher Math 2nd Paper'],B1:['Biology','Biology 1st Paper (Botany)'],B2:['Biology','Biology 2nd Paper (Zoology)']};
+const KIND={learn:'Learn',mcq:'MCQs',du:'DU + written',revise:'Revise',mixed:'Mixed MCQs',spaced:'Spaced revision',errlog:'Error log',mock:'Mock exam',flex:'Flex slot',weak:'Weak-spot repair',other:'Prep'};
+const STAT=['Not Started','In Progress','Theory Completed','MCQ Practice Completed','DU Questions Completed','Revised','Mastered'];
+/* ================= QUESTION-BANK DATA (as supplied; null = unavailable) ================= */
+/* [id, paper, name, MCQ, Written, DU, stars, planTier, why, topics[[name,count]]] */
+const RAW=[
+['P1_PW','P1','Physical World & Measurement',64,0,2,1,2,'Ranked last by score, but units and dimensions form a 41-question cluster and it is your declared backlog. Kept at Tier 2 for that reason (my judgement).',[['Physical quantities, units & dimensions',41,'DU 2']]],
+['P1_VEC','P1','Vectors',118,6,16,4,1,'Rank 2 by score (168). New to you, so it gets two sessions.',[]],
+['P1_DYN','P1','Dynamics',100,3,17,3,2,'17 DU; kinematics and projectile motion feed Newtonian Mechanics and Math-2 mechanics.',[]],
+['P1_NEW','P1','Newtonian Mechanics',176,5,13,5,1,'Rank 1 by score (217); its 72-question cluster is the biggest topic in the paper.',[['Force, impulse, momentum & lift',72,'W 1 · DU 7']]],
+['P1_WEP','P1','Work, Energy & Power',117,6,16,4,1,'Rank 3 (167). Work (42) and Energy (38, with 4 written and 8 DU) clusters.',[['Work',42,'W 1 · DU 4'],['Energy',38,'W 4 · DU 8']]],
+['P1_GRAV','P1','Gravitation',104,7,11,3,2,'7 written questions and a 42-question cluster.',[['Gravitational force & acceleration',42,'W 1 · DU 2']]],
+['P1_PER','P1','Periodic Motion',98,5,17,3,2,'17 DU; the simple pendulum alone is 53 MCQs.',[['Simple pendulum',53,'W 1 · DU 4']]],
+['P1_WAVE','P1','Waves',94,1,16,2,3,'16 DU despite few written questions; progressive-waves cluster (32).',[['Progressive waves',32,'DU 5']]],
+['P1_STR','P1','Structural Properties of Matter',111,0,8,2,3,'No written questions; Young’s modulus cluster (46).',[['Stress, strain & Young’s modulus',46,'DU 5']]],
+['P1_GAS','P1','Ideal Gas & Kinetic Theory',102,1,11,2,4,'No hot-topic cluster supplied; short revision only because of time (my judgement).',[]],
+['P2_CUR','P2','Current Electricity',185,6,24,5,1,'Highest score in Physics 2nd (251) and 24 DU.',[]],
+['P2_THERMO','P2','Thermodynamics',166,8,24,5,1,'Joint-highest DU (24) plus 8 written; score 238.',[]],
+['P2_ATOM','P2','Atomic Models & Nuclear Physics',125,5,21,4,2,'21 DU; third by score.',[]],
+['P2_STAT','P2','Static Electricity',129,4,17,4,2,'129 MCQs and 17 DU.',[]],
+['P2_MOD','P2','Introduction to Modern Physics',112,4,18,3,3,'18 DU; score 160. Selective pack.',[]],
+['P2_SEMI','P2','Semiconductors & Electronics',143,2,11,4,3,'High MCQ count, low DU. Gates and diodes are quick MCQ marks.',[]],
+['P2_GEO','P2','Geometrical Optics',116,3,18,3,3,'18 DU; selective pack.',[]],
+['P2_PHY','P2','Physical Optics',86,0,12,3,4,'No written questions; short revision.',[]],
+['P2_MAG','P2','Magnetic Effects & Magnetism',62,0,8,2,4,'Short revision.',[]],
+['P2_EMI','P2','Electromagnetic Induction & AC',55,0,5,2,4,'Short revision.',[]],
+['P2_ASTRO','P2','Astronomy',25,2,1,1,4,'Lowest return in Physics 2nd.',[]],
+['C1_LAB','C1','Safe Use of Laboratory',27,1,3,1,4,'Only 27 MCQs and 3 DU: lowest return, skim only. (My earlier table gave this chapter much larger numbers; your verified data replaces it.)',[]],
+['C1_QUAL','C1','Qualitative Chemistry',299,11,45,5,1,'Most DU questions (45) and the highest MCQ count in Chemistry 1st. Electron-configuration cluster (53).',[['Electron configuration basics',53,'DU 5']]],
+['C1_BOND','C1','Periodic Properties & Chemical Bonding',295,10,37,5,1,'Hybridisation/VSEPR (63) and periodic-property (60) clusters.',[['Hybridisation, VSEPR & bond angles',63,'DU 10'],['Periodic properties (ionisation energy etc.)',60,'DU 9']]],
+['C1_CHG','C1','Chemical Change',268,18,35,5,1,'Most written questions (18) in Chemistry 1st. pH/pOH (72) and buffer/Henderson (56) clusters.',[['pH and pOH calculations',72,'DU 6'],['Buffers & Henderson equation',56,'DU 4']]],
+['C1_VOC','C1','Vocational Chemistry (কর্মমুখী)',77,5,4,3,3,'Selective: 3★ but only 4 DU.',[]],
+['C2_ORG','C2','Organic Chemistry',591,23,75,5,1,'By far the largest: 75 of 142 DU (61 MCQ + 14 written). New to you, so it is learned selectively.',[['Carbonyl compounds: aldehydes, ketones',71],['Isomerism',63],['Alkanes, alkenes, alkynes',62],['Aromatic hydrocarbons',59],['Organic acids & amines',57],['Organic compounds & homologous series',52]]],
+['C2_QUANT','C2','Quantitative Chemistry',284,10,20,4,1,'Its two biggest topics are #1 and #2 in the whole paper (94 and 83 MCQs). Numerical, so learnable in a short time. DU 20 (all MCQ).',[['Concentration problems',94],['Redox & titration',83],['Acid–base titration',42],['Chemical calculations',35],['Equation-based calculations',23]]],
+['C2_ENV','C2','Environmental Chemistry (incl. gas laws)',205,9,20,4,2,'Gas laws (65) are mostly numerical practice. DU 20 (15 MCQ + 5 written).',[['Atmosphere & gas laws',65],['DO, BOD, COD & acid rain',34],['Acid–base theory',31],['Ideal & real gases',22],['Greenhouse gases, pollutants, heavy metals',17]]],
+['C2_ELEC','C2','Electrochemistry',140,6,22,3,2,'22 DU, more than Environmental (20).',[['Faraday’s laws',43],['Electrolytic cells',26],['Electrode & cell potential',22]]],
+['C2_ECON','C2','Economic Chemistry',53,1,5,2,4,'Lowest-return chapter in Chemistry 2nd; skim only.',[['Chemical industries: glass, cement, tanning',18],['Pollution & pollution control',18],['Natural gas, coal, urea',17]]],
+['M1_DIFF','M1','Differentiation',312,11,30,5,1,'Highest question count in Math 1st (323 total).',[]],
+['M1_INT','M1','Integration',222,6,35,5,1,'Highest DU count in Math 1st (35).',[]],
+['M1_LINE','M1','Straight Line',211,4,29,5,1,'29 DU; learnable with practice.',[]],
+['M1_TRIG','M1','Trigonometry (compound & multiple angles)',123,10,21,4,2,'21 DU and 10 written.',[]],
+['M1_MAT','M1','Matrices & Determinants',119,3,15,4,2,'Your declared backlog; 15 DU.',[]],
+['M1_PNC','M1','Permutation & Combination',109,5,13,4,3,'4★ but time-limited, so a compact pack.',[]],
+['M1_CIRC','M1','Circle',117,0,11,3,3,'No written questions; selective.',[]],
+['M1_FUNC','M1','Functions & Graphs',93,7,14,3,3,'Selective; 7 written.',[]],
+['M1_VEC','M1','Vector',54,2,10,2,3,'Few questions but 10 DU.',[]],
+['M1_TR','M1','Trigonometric Ratios',59,2,3,1,4,'Lowest return in Math 1st.',[]],
+['M2_REAL','M2','Real Numbers & Inequalities',85,4,15,3,2,'Inequality clusters (24 + 14); quick to learn.',[['Inequalities',24],['Absolute-value form',14]]],
+['M2_LP','M2','Linear Programming',9,1,4,1,4,'Lowest return in Math 2nd.',[['Maximum / minimum value',9]]],
+['M2_CPX','M2','Complex Numbers',98,8,9,4,2,'98 MCQs and 8 written.',[['Modulus & argument',22],['Finding roots',22]]],
+['M2_POLY','M2','Polynomials & Polynomial Equations',127,9,14,5,1,'5★; the root-relation cluster alone is 47 MCQs.',[['Relations between roots',47],['Determinant-related problems',20]]],
+['M2_BIN','M2','Binomial Expansion',73,9,13,3,2,'Score 126, level with Real Numbers (127); 9 written. Scheduled as a compact pack because of time.',[['Coefficient of terms with powers of x',32],['Series',8]]],
+['M2_CON','M2','Conics',125,1,16,5,1,'5★; parabola (37) and ellipse (35) clusters.',[['Parabola',37],['Ellipse',35]]],
+['M2_INV','M2','Inverse Trigonometric Functions & Equations',115,8,19,5,1,'5★; value-finding alone is 51 MCQs.',[['Finding values',51],['Quadratic-form expressions',21],['Odd-number-of-terms equations',11]]],
+['M2_STAT','M2','Statics',85,7,16,3,2,'16 DU; angle and resultant clusters.',[['Finding angles',22],['Resultant of two forces (parallelogram law)',19],['Three concurrent forces',16]]],
+['M2_MOT','M2','Motion of Particles in a Plane',61,7,17,4,2,'17 DU; projectile cluster (28). Official chapter MCQ count is 61.',[['Projectile motion',28],['Vertical motion',23],['Laws of motion',15]]],
+['M2_PROB','M2','Measures of Dispersion & Probability',66,8,9,2,3,'8 written; selective.',[['Ball/marble probability',17],['Number probability',13],['Variance, standard deviation, coefficient',9]]],
+['B1_CELL','B1','Cell & its Structure',null,null,180,null,1,'',[],606],
+['B1_DIV','B1','Cell Division',null,null,76,null,2,'DU 76 is mid-range, but it is your declared backlog, so it gets full sessions (my judgement). 170 total across universities.',[],170],
+['B1_CHEM','B1','Cell Chemistry',null,null,64,null,3,'',[],251],
+['B1_MIC','B1','Microbes',null,null,108,null,2,'',[],367],
+['B1_ALG','B1','Algae & Fungi',null,null,67,null,3,'',[],205],
+['B1_BRY','B1','Bryophyta & Pteridophyta',null,null,17,null,4,'',[],87],
+['B1_GYM','B1','Gymnosperms & Angiosperms',null,null,112,null,2,'',[],288],
+['B1_TIS','B1','Tissue & Tissue System',null,null,78,null,3,'',[],209],
+['B1_PHY','B1','Plant Physiology',null,null,160,null,1,'',[],487],
+['B1_REP','B1','Plant Reproduction',null,null,66,null,3,'',[],175],
+['B1_BIOT','B1','Biotechnology',null,null,93,null,2,'',[],299],
+['B1_ECO','B1','Environment, Distribution & Conservation',null,null,72,null,3,'',[],249],
+['B2_CLS','B2','Animal Diversity & Classification',null,null,144,null,1,'',[],391],
+['B2_ANI','B2','Animal Identity (প্রাণীর পরিচিতি)',null,null,140,null,1,'',[],330],
+['B2_DIG','B2','Digestion & Absorption',null,null,153,null,1,'',[],343],
+['B2_BLD','B2','Blood & Circulation',null,null,124,null,1,'',[],303],
+['B2_RES','B2','Respiration & Gas Exchange',null,null,78,null,3,'',[],183],
+['B2_EXC','B2','Excretion',null,null,38,null,4,'',[],121],
+['B2_LOC','B2','Locomotion',null,null,102,null,2,'',[],248],
+['B2_COO','B2','Coordination & Control',null,null,75,null,3,'',[],306],
+['B2_CON','B2','Continuity of Human Life',null,null,56,null,4,'',[],159],
+['B2_IMM','B2','Human Defence (Immunity)',null,null,44,null,4,'',[],125],
+['B2_GEN','B2','Genetics & Evolution',null,null,154,null,1,'',[],345],
+['B2_BEH','B2','Animal Behaviour',null,null,18,null,4,'',[],57]
+];
+const CHAPS=RAW.map(r=>({id:r[0],p:r[1],s:PAPERS[r[1]][0],name:r[2],mcq:r[3],w:r[4],du:r[5],stars:r[6],tier:r[7],why:r[8]||('DU '+r[5]+' · '+r[10]+' total across listed universities.'),topics:r[9],tot:r[10]==null?null:r[10]}));
+const CH={};CHAPS.forEach(c=>CH[c.id]=c);
+const score=c=>c.mcq==null?null:c.mcq+3*c.w+2*c.du;
+const C1_HOT=[['pH and pOH calculations','Cross-chapter',72,'6 DU'],['Hybridisation, VSEPR & bond angles','Cross-chapter',60,'10 DU'],['Chemical bonding concepts','Cross-chapter',60,'9 DU'],['Chemical equilibrium & Kc','Cross-chapter',56,'4 DU'],['Electron configuration','Cross-chapter',50,'5 DU']];
+const NOTES={
+P1:'Verified table from your screenshots. Scores match your formula. Totals: 1,084 MCQ, 34 written, 127 DU. Written/DU extras for the hot topics are shown beside them.',
+P2:'Verified. Totals: 1,204 MCQ, 34 written, 159 DU. Modern Physics now has 4 written (an earlier version said 8). Star ratings are as supplied.',
+C1:'This replaces my earlier Chemistry 1st table, which was shifted by one chapter. For example, Safe Use of Laboratory is only 27 MCQs and 3 DU, while Qualitative Chemistry has 45 DU. Topic counts are the “Total” figures you supplied. Totals: 966 MCQ, 45 written, 124 DU.',
+C2:'Chapter MCQs add to 1,273 and DU to 142, matching your totals. Chapter written counts add to 49, but your stated total is 48; I used the chapter figures as given. The top-10 topics are about 51% of MCQs.',
+M1:'This replaces the mistaken Physics-copy table. You defined Total = MCQ + Written, so MCQ here is Total − Written, derived by me (for example Differentiation 323 − 11 = 312). Scores use that derived MCQ. No topic lists were supplied for this paper.',
+M2:'DU adds to 132 as stated. Chapter MCQs add to 844, not the stated 874 (gap of 30), and chapter written counts add to 62, not the stated 58. I used the chapter figures as given, with 61 for Chapter 9 as you instructed. Treat the stated totals as unverified.',
+B:'Only the DU count and a total across listed universities were supplied: there is no MCQ/written split and no star ratings, so the formula cannot be applied. Tiers are my banding of the DU column: Tier 1 is 120+, Tier 2 is 90–119 (plus your Cell Division backlog), Tier 3 is 60–89, Tier 4 is under 60.'
+};
+/* ================= SCHEDULE GENERATION ================= */
+const TASKS=[];let SEQ=0;
+function push(n,ch,kind,mins,title,detail,m,w,d,opt,slot){TASKS.push({id:'t'+(++SEQ),date:addDays(START,n),ch:ch,kind:kind,mins:mins,title:title,detail:detail||'',m:m||0,w:w||0,d:d||0,opt:!!opt,slot:slot||0});}
+function add(n,ch,kind,mins,title,detail,m,w,d,opt,slot){
+ m=m||0;w=w||0;d=d||0;detail=detail||'';
+ if(kind==='practice'){
+  if(m>0&&(w+d)>0&&mins>=25){
+   const a=Math.max(10,Math.round(mins*0.55/5)*5);
+   push(n,ch,'mcq',a,'MCQ practice — '+title,m+' chapter MCQs at about 45–60 s each; mark every doubtful one. '+detail,m,0,0,opt);
+   const parts=[];if(d)parts.push(d+' previous-year DU question'+(d===1?'':'s'));if(w)parts.push(w+' written question'+(w===1?'':'s'));
+   push(n,ch,'du',mins-a,'DU + written — '+title,'Solve '+parts.join(' and ')+'. For written answers: formula → substitution → units/steps, one clean method.',0,w,d,opt);
+  }else if(m>0){push(n,ch,'mcq',mins,'Practice — '+title,detail+(d?' Include '+d+' DU question'+(d===1?'':'s')+'.':''),m,w,d,opt);}
+  else{push(n,ch,'du',mins,'Written — '+title,detail||('Solve '+w+' written question(s) step by step.'),0,w,d,opt);}
+ }else push(n,ch,kind,mins,title,detail,m,w,d,opt,slot);
+}
+const L=(ch,mins,t,d,opt)=>[ch,'learn',mins,t,d,0,0,0,opt];
+const P=(ch,mins,t,d,m,w,dd,opt)=>[ch,'practice',mins,t,d,m,w,dd,opt];
+const R=(ch,mins,t,d,m,w,dd,opt)=>[ch,'revise',mins,t,d,m,w,dd,opt];
+const WK=(subj,mins,slot)=>['WEAK:'+subj,'weak',mins,'','',10,1,2,false,slot];
+function daily(n,o){
+ o=o||{};
+ if(o.skip)return;
+ if(o.mock)add(n,'MIX','mock',o.mock[0],o.mock[1],o.mock[2],o.mock[3]||0,o.mock[4]||0,0);
+ else add(n,'MIX','mixed',20,'Timed mixed MCQs — 25 questions','All four subjects, drawn from chapters studied 1, 3 and 7 days ago. 45 seconds each. Answer only if you can eliminate at least two options; otherwise skip (−0.25 per wrong answer).',25);
+ add(n,'MIX','spaced',15,'Spaced revision (auto-picked)','');
+ add(n,'MIX','errlog',15,'Error notebook & formula page','Log every mistake from today with its cause (concept / calculation / silly / memory). Redo items that are due. Read one formula page.');
+}
+function day(n,list,o){list.forEach(a=>add.apply(null,[n].concat(a)));daily(n,o);}
+/* ---------- PHASE 1 ---------- */
+day(0,[
+L('M1_MAT',60,'Matrices & determinants — clear the backlog','Types of matrices, operations, determinant expansion and properties, adjoint, inverse. Rewatch only what you could not follow; write each determinant property once.'),
+P('M1_MAT',50,'Matrices','Finish the pending written questions, re-solve the difficult MCQs you flagged, attempt the unsolved problems.',12,3,2),
+L('P1_PW',40,'Physical World & Measurement — hot cluster','Physical quantities, units, dimensions and dimensional analysis (the 41-MCQ cluster), significant figures, percentage error. Write the dimensions of velocity, force, energy, pressure, G and h from memory.'),
+P('P1_PW',25,'Units & dimensions','All chapter MCQs on units and dimensions, then the DU questions.',15,0,2),
+L('P1_VEC',35,'Vectors — start','Scalar vs vector, triangle and parallelogram law, unit vector, resolution into components.'),
+L('C2_ORG',45,'Organic Lecture 1 + hybridisation & IUPAC naming','Watch Lecture 1 at 1.25–1.5×. sp³/sp²/sp, σ and π bonds, IUPAC rules for alkanes, alkenes, alkynes and common functional groups, plus homologous series (a 52-question topic). Make a one-page naming summary.'),
+P('C2_ORG',25,'IUPAC naming','Name or draw 20 structures. Start your reaction-card deck (one card per reaction: reagent → product → condition).',10,1,0),
+L('C1_QUAL',30,'Qualitative Chemistry — part 1','Work through your sheet or lecture. Note which topics the DU questions repeat and summarise the key rules in 10 lines.'),
+P('C1_QUAL',20,'Qualitative Chemistry','Chapter MCQs and DU questions.',12,0,3),
+L('B1_CELL',55,'Cell & its structure — part 1','Cell theory, prokaryote vs eukaryote, plasma membrane (fluid-mosaic), cell wall, nucleus. Draw and label each; make a differences table.'),
+P('B1_CELL',35,'Cell structure','Chapter MCQs, one “differentiate” written answer, DU-style questions.',10,1,2)
+]);
+day(1,[
+L('M1_MAT',55,'Matrices — linear systems','Cramer’s rule, matrix method for linear systems, consistency conditions.'),
+P('M1_MAT',55,'Matrices — mixed set','Chapter MCQs, written bank and DU questions. Log every error.',12,3,3),
+L('P1_VEC',55,'Vectors — products & applications','Dot product, cross product, projection, area of a triangle or parallelogram, angle between vectors.'),
+P('P1_VEC',45,'Vectors','Chapter MCQs, numericals and DU questions.',15,2,3),
+L('C2_ORG',45,'Isomerism (63 MCQs)','Chain, position, functional, metamerism, tautomerism; cis–trans isomerism; optical isomerism basics: chiral carbon, enantiomers, racemic mixture.'),
+P('C2_ORG',25,'Isomerism','Count isomers of C4–C6 compounds and identify chiral centres.',15,0,0),
+L('C1_QUAL',30,'Qualitative Chemistry — part 2','Continue the chapter, including electron configuration (a 53-question topic, 5 DU). Note exceptions and shortcuts.'),
+P('C1_QUAL',20,'Qualitative Chemistry','Chapter MCQs and DU questions.',12,0,3),
+L('B1_CELL',55,'Cell & its structure — part 2','Mitochondria, chloroplast, ER, Golgi, lysosome, ribosome, vacuole, cytoskeleton: structure and function with labelled diagrams.'),
+P('B1_CELL',35,'Cell structure','Chapter MCQs, written questions and DU-style questions.',13,1,2)
+]);
+day(2,[
+L('M1_LINE',60,'Straight Line — part 1','Slope, equation forms (slope-intercept, two-point, intercept, normal), distance of a point from a line, angle between lines, parallel and perpendicular lines.'),
+P('M1_LINE',50,'Straight Line','Chapter MCQs, written questions, DU questions.',12,2,3),
+L('P1_DYN',55,'Dynamics — kinematics','Equations of motion, projectile motion (range, height, time), relative velocity, circular motion basics.'),
+P('P1_DYN',45,'Dynamics','MCQs, numericals and DU questions.',15,2,2),
+L('C2_ORG',45,'Electronic effects & acid/base strength','Inductive effect, resonance, hyperconjugation, carbocation stability, ordering of acid and base strength. This drives most ordering MCQs.'),
+P('C2_ORG',25,'Ordering questions','Rank sets of acids, bases and carbocations.',15,0,0),
+L('C1_CHG',30,'Chemical Change — part 1: pH & pOH','pH and pOH calculations (the 72-question cluster, 6 DU): strong and weak acids and bases, Ka/Kb, dilution.'),
+P('C1_CHG',20,'pH & pOH','Numericals, chapter MCQs and DU questions.',15,0,4),
+L('B1_DIV',55,'Cell division — cell cycle & mitosis','Interphase (G1/S/G2), mitotic phases, spindle, cytokinesis in plants vs animals, significance. Draw each stage from memory.'),
+P('B1_DIV',35,'Cell division','Chapter MCQs, written questions, DU-style questions.',13,1,2)
+]);
+day(3,[
+L('M1_LINE',55,'Straight Line — part 2','Concurrency of lines, area of a triangle, pair of straight lines, angle bisectors, locus.'),
+P('M1_LINE',55,'Straight Line — mixed set','Chapter MCQs, written questions, DU questions (29 DU in your data).',15,2,4),
+L('P1_NEW',55,'Newtonian Mechanics — part 1','Newton’s laws, momentum conservation, impulse, collisions, lift and rocket: the 72-MCQ cluster.'),
+P('P1_NEW',45,'Newtonian Mechanics','Force/impulse/momentum/lift MCQs, numericals, DU questions.',20,2,3),
+L('C2_ORG',45,'Alkanes & alkenes (62 MCQs, with alkynes)','Preparation, halogenation, addition of HX (Markovnikov), hydration, hydrogenation, ozonolysis, test for unsaturation.'),
+P('C2_ORG',25,'Alkanes & alkenes','Write a reaction card for each reaction, then MCQs.',10,1,0),
+L('C1_CHG',30,'Chemical Change — part 2: buffers','Buffer solutions and the Henderson equation (56-question cluster, 4 DU), common-ion effect, buffer capacity.'),
+P('C1_CHG',20,'Buffers','Numericals, chapter MCQs and DU questions.',15,0,2),
+L('B1_DIV',55,'Meiosis & comparison','Meiosis I and II, crossing over, chiasma, significance; mitosis vs meiosis table; chromosome-number problems.'),
+P('B1_DIV',35,'Cell division','Chapter MCQs, written questions, DU-style questions.',13,1,2)
+]);
+day(4,[
+L('M1_DIFF',60,'Limits & differentiation — part 1','Limits, continuity, derivative from first principles, standard derivatives, product/quotient/chain rule.'),
+P('M1_DIFF',50,'Differentiation','Chapter MCQs (the highest MCQ count in Math 1st), written questions, DU questions.',15,2,3),
+L('P1_NEW',55,'Newtonian Mechanics — part 2','Friction, inclined plane, circular motion, torque, moment of inertia, angular momentum conservation.'),
+P('P1_NEW',45,'Newtonian Mechanics','MCQs, numericals, DU questions.',20,2,3),
+L('C2_ORG',45,'Alkynes & alkyl halides','Terminal alkyne acidity, tests, hydration; SN1/SN2 vs E1/E2 and what decides the pathway.'),
+P('C2_ORG',25,'Alkynes & halides','Draw mechanism sketches, then MCQs.',10,1,0),
+L('C1_BOND',30,'Periodic properties (60-question cluster, 9 DU)','Trends in ionisation energy, electron affinity, electronegativity and radius; periodic-table blocks and exceptions.'),
+P('C1_BOND',20,'Periodic properties','Chapter MCQs and DU questions.',15,0,3),
+L('B2_CLS',55,'Animal diversity & classification','Classification principles, the major phyla and their key features, typical examples. Make a phylum comparison table (144 DU in your data).'),
+P('B2_CLS',35,'Animal classification','Chapter MCQs, written questions and DU-style questions.',13,1,2)
+]);
+day(5,[
+L('M1_DIFF',60,'Differentiation — part 2','Trig, inverse trig, exponential and log derivatives; implicit and parametric differentiation; higher-order derivatives.'),
+P('M1_DIFF',50,'Differentiation','Chapter MCQs, written questions, DU questions.',15,2,3),
+L('P1_WEP',55,'Work, Energy & Power — part 1','Work by constant and variable force, work–energy theorem, kinetic and potential energy (Work 42 + Energy 38 MCQs).'),
+P('P1_WEP',45,'Work, Energy & Power','MCQs, numericals, DU questions.',20,2,2),
+L('C2_ORG',45,'Aromatic hydrocarbons (59 MCQs)','Benzene structure and resonance; nitration, halogenation, sulfonation, Friedel–Crafts; directing groups (o/p vs m).'),
+P('C2_ORG',25,'Aromatic hydrocarbons','Predict products for 10 substituted benzenes, then MCQs.',12,1,0),
+L('C1_BOND',30,'Hybridisation, VSEPR & bond angles','Shapes with and without lone pairs, bond angles, polarity (the 63-question cluster, 10 DU).'),
+P('C1_BOND',20,'Chemical bonding','Chapter MCQs and DU questions.',15,0,4),
+L('B1_PHY',55,'Plant physiology — photosynthesis','Light and dark reactions, photosystems, Calvin cycle, C3/C4, limiting factors.'),
+P('B1_PHY',35,'Photosynthesis','Chapter MCQs, written questions, DU-style questions.',13,1,2)
+]);
+day(6,[
+L('M1_DIFF',45,'Differentiation — part 3: applications','Tangent and normal, increasing/decreasing, maxima/minima, rate of change.'),
+P('M1_DIFF',35,'Differentiation applications','Chapter MCQs, written questions, DU questions.',15,2,3),
+L('P1_WEP',45,'Work, Energy & Power — part 2','Power, conservation of energy, collisions and energy, efficiency.'),
+P('P1_WEP',35,'Work, Energy & Power','MCQs, numericals, DU questions.',15,2,2),
+L('C2_ORG',35,'Alcohols, phenols, ethers','Lucas test, oxidation, Reimer–Tiemann, Kolbe, Williamson; acidity of phenol vs alcohol.'),
+P('C2_ORG',20,'Alcohols & phenols','Reaction cards and MCQs.',10,1,0),
+L('C1_CHG',25,'Chemical Change — part 3: rest of the chapter','Finish the remaining topics from your sheet (equilibrium, Le Chatelier, Kc/Kp) and mix in pH and buffer numericals. This chapter has the most written questions (18) in Chemistry 1st.'),
+P('C1_CHG',20,'Chemical Change mixed set','Numericals, MCQs and DU questions.',15,2,2),
+L('B1_PHY',40,'Plant physiology — respiration & transpiration','Glycolysis, Krebs cycle, ETC, fermentation; transpiration and stomatal control.'),
+P('B1_PHY',25,'Plant physiology','Chapter MCQs and DU-style questions.',10,1,2),
+['MIX','flex',60,'Flex slot — catch-up or weakest topic','Automatically filled with any missed tasks. If nothing is missed, spend it on the topic you got most wrong this week.']
+],{mock:[45,'Mini-mock — 30 MCQs in 25 minutes (Physics + Chemistry)','Take it timed, then spend 20 minutes reviewing every wrong or skipped question. Log it under Mocks.',30,0]});
+/* ---------- PHASE 2 ---------- */
+day(7,[
+L('M1_INT',60,'Integration — part 1','Standard integrals, substitution, integration by parts.'),
+P('M1_INT',50,'Integration','Chapter MCQs and written questions. Integration has the highest DU count (35) in Math 1st.',15,2,4),
+L('P1_GRAV',55,'Gravitation','Law of gravitation, variation of g, escape and orbital velocity, satellites, Kepler’s laws (42-MCQ cluster).'),
+P('P1_GRAV',45,'Gravitation','MCQs, numericals and DU questions.',20,2,3),
+L('C2_ORG',45,'Carbonyl compounds 1 (71 MCQs — your top Organic topic)','Aldehyde/ketone naming, preparation, nucleophilic addition mechanism, reactivity order.'),
+P('C2_ORG',25,'Carbonyl compounds','Reaction cards and MCQs.',15,1,0),
+L('C2_ENV',30,'Gas laws, ideal & real gases (65 + 22 MCQs)','Boyle, Charles, Avogadro, ideal gas equation, Dalton, Graham, van der Waals; numericals.'),
+P('C2_ENV',20,'Gas laws','Numericals and MCQs.',15,2,2),
+L('B2_GEN',55,'Genetics — Mendel & inheritance','Mendel’s laws, monohybrid and dihybrid crosses, test cross, incomplete dominance, sex-linked inheritance, pedigrees.'),
+P('B2_GEN',35,'Genetics','Cross problems, MCQs and DU-style questions.',13,1,2)
+]);
+day(8,[
+L('M1_INT',55,'Integration — part 2','Partial fractions, definite integral properties, area under a curve.'),
+P('M1_INT',55,'Integration','Chapter MCQs, written questions and DU questions.',15,2,4),
+L('P1_PER',55,'Periodic Motion (SHM)','SHM equations, simple pendulum (53-MCQ cluster), spring–mass system, energy in SHM.'),
+P('P1_PER',45,'Periodic Motion','MCQs, numericals and DU questions.',20,2,3),
+L('C2_ORG',45,'Carbonyl compounds 2 + carboxylic acids','Tollens, Fehling, iodoform, aldol, Cannizzaro, Grignard; acid strength and esterification.'),
+P('C2_ORG',25,'Carbonyl reactions','Reaction cards and MCQs.',12,1,0),
+L('C2_ENV',30,'Environmental chemistry & acid–base theory','DO/BOD/COD, acid rain, greenhouse gases, pollutants, heavy metals; acid–base theory (31).'),
+P('C2_ENV',20,'Environmental chemistry','MCQs and DU questions.',15,1,2),
+L('B2_GEN',55,'Genetics — DNA, expression & evolution','DNA structure, replication, transcription, translation, mutation, evolution basics.'),
+P('B2_GEN',35,'Genetics','MCQs, written questions and DU-style questions.',13,1,2)
+]);
+day(9,[
+L('M2_INV',45,'Inverse trigonometric functions','Principal values (51-MCQ cluster), identities for sin⁻¹/cos⁻¹/tan⁻¹ sums, trig expressions (21), equations (11).'),
+P('M2_INV',25,'Inverse trigonometry','MCQs, written and DU questions.',15,1,3),
+L('M1_TRIG',25,'Trigonometry (Math 1st, Ch 7) — key identities','Compound angles, multiple angles, sum-to-product, general solutions.'),
+P('M1_TRIG',15,'Trigonometry','Chapter MCQs and 2 DU questions.',10,0,2),
+L('P2_CUR',55,'Current Electricity — part 1','Ohm’s law, resistivity and temperature, series/parallel, Kirchhoff’s laws, Wheatstone bridge.'),
+P('P2_CUR',45,'Current Electricity','MCQs, numericals and DU questions.',20,2,3),
+L('C2_ORG',45,'Organic acids & amines (57 MCQs)','Acidity order, derivatives (esters, acid chlorides, amides), amine basicity order, diazonium basics.'),
+P('C2_ORG',25,'Acids & amines','Reaction cards and MCQs.',12,1,0),
+L('C2_QUANT',30,'Quantitative 1 — concentration problems (94 MCQs, top topic)','Molarity, molality, normality, ppm, percent concentration, dilution and mixing problems.'),
+P('C2_QUANT',20,'Concentration problems','MCQs and numericals.',15,2,2),
+L('B2_DIG',55,'Digestion & absorption','Digestive system, enzymes and secretions, absorption in the small intestine, liver and pancreas.'),
+P('B2_DIG',35,'Digestion','MCQs, written questions and DU-style questions.',13,1,2)
+]);
+day(10,[
+L('M2_POLY',60,'Polynomials & equations (Math 2nd, Ch 4)','Root–coefficient relations (47-MCQ cluster), determinant-related problems (20), remainder and factor theorems.'),
+P('M2_POLY',50,'Polynomials','MCQs, written and DU questions.',15,2,3),
+L('P2_CUR',50,'Current Electricity — part 2','Heating effect, electrical power, potentiometer, meter bridge, cells and internal resistance.'),
+P('P2_CUR',35,'Current Electricity','MCQs, numericals, DU questions.',20,2,3),
+L('C2_ORG',40,'Organic conversions workshop','Build 15 conversion chains from your reaction cards (alkane → alcohol → acid; benzene → substituted products). Write the reagent and condition for each step.'),
+P('C2_ORG',25,'Conversions','Write 4 full conversions from memory.',0,4,0),
+L('C2_QUANT',30,'Quantitative 2 — redox & acid–base titration (83 + 42)','Oxidation numbers and balancing redox (needed first), redox titration, acid–base titration, chemical and equation-based calculations.'),
+P('C2_QUANT',20,'Titration','MCQs and numericals.',15,2,2),
+L('B2_BLD',55,'Blood & circulation','Blood components, clotting, blood groups, heart structure, cardiac cycle, circulation.'),
+P('B2_BLD',35,'Blood & circulation','MCQs, written questions and DU-style questions.',13,1,2)
+],{mock:[50,'Sectional mock — 40 MCQs in 30 minutes (all four subjects)','Then 20 minutes of review. DECISION POINT: check the official circular. If your target department needs only Biology or only Math, trim the other to 45 minutes a day and give that time to Physics and Chemistry. Log it under Mocks.',40,0]});
+day(11,[
+L('M2_CON',60,'Conics (Math 2nd, Ch 6)','Parabola elements from its equation (37-MCQ cluster), ellipse elements (35), standard forms, focus/directrix/latus rectum, tangent and normal basics.'),
+P('M2_CON',50,'Conics','MCQs, written and DU questions.',15,1,3),
+L('P2_THERMO',55,'Thermodynamics — part 1','Zeroth and first law, work in isothermal/adiabatic/isobaric/isochoric processes, specific heats Cp and Cv, γ.'),
+P('P2_THERMO',45,'Thermodynamics','MCQs, numericals and DU questions.',20,2,3),
+L('C2_ORG',25,'Organic gap-fill','One pass over your cards for the weakest of: carbonyl, acids/amines, aromatic substitution. Watch only the lecture clip you need, at 1.5×.'),
+P('C2_ORG',40,'Organic timed set','40 Organic MCQs at 45 s each. Review every miss and add it to the cards and the error notebook.',40,0,0),
+L('C2_ELEC',30,'Electrochemistry — Faraday, cells, potential','Faraday’s laws (43), electrolytic cells (26), electrode and cell potential (22).'),
+P('C2_ELEC',25,'Electrochemistry','MCQs, numericals and DU questions.',15,2,2),
+L('B2_ANI',55,'Animal identity (140 DU in your data)','Go through the animals in your syllabus one by one: external features, body systems, life cycle where asked. Use comparison tables.'),
+P('B2_ANI',35,'Animal identity','MCQs, written questions and DU-style questions.',13,1,2)
+]);
+day(12,[
+L('M2_CPX',40,'Complex numbers (Math 2nd, Ch 3)','Modulus and argument (22), cube roots (22), polar form, conjugates.'),
+P('M2_CPX',25,'Complex numbers','MCQs, written and DU questions.',12,1,2),
+L('M2_BIN',25,'Binomial expansion — pack','Coefficient of the term containing xⁿ (32-MCQ cluster), general term, middle term.'),
+P('M2_BIN',20,'Binomial expansion','MCQs and written practice.',12,1,1),
+L('P2_THERMO',40,'Thermodynamics — part 2','Second law, Carnot engine and efficiency, entropy, heat-transfer relations.'),
+P('P2_THERMO',20,'Thermodynamics','MCQs and DU questions.',10,1,2),
+L('P2_STAT',25,'Static Electricity — part 1','Coulomb’s law, electric field, Gauss’s law.'),
+P('P2_STAT',15,'Static Electricity','MCQs and 1 DU question.',8,0,1),
+P('C1_CHG',15,'Chemistry 1st DU set — Chemical Change','Timed DU questions, 45 s per MCQ.',10,0,6),
+P('C1_QUAL',15,'Chemistry 1st DU set — Qualitative','Timed DU questions, 45 s per MCQ.',10,0,6),
+P('C1_BOND',15,'Chemistry 1st DU set — Periodic & Bonding','Timed DU questions, 45 s per MCQ.',10,0,6),
+L('C2_ECON',15,'Economic Chemistry — skim (low priority)','Headings only: glass, cement and tanning; pollution control; natural gas, coal and urea.',true),
+P('C2_ORG',40,'Organic mixed set on your errors','Mixed Organic MCQs drawn from the error notebook, plus 2 conversions.',30,1,0),
+R('C2_QUANT',20,'Quantitative redo','Redo the concentration and titration problems you got wrong.',15,2,0),
+L('B1_GYM',35,'Gymnosperms & angiosperms (112 DU)','Characteristics, life cycles, classification and examples; make a gymnosperm vs angiosperm table.'),
+L('B1_MIC',35,'Microbes (108 DU)','Virus, bacteria and other microbes: structure, reproduction, importance and diseases.'),
+P('B1_GYM',20,'Gymnosperms, angiosperms & microbes','MCQs and DU-style questions across both chapters.',12,0,3)
+]);
+day(13,[
+L('M2_MOT',35,'Mechanics pack — projectile & vertical motion','Projectile motion (28), vertical motion (23), applications of equations of motion (15).'),
+L('M2_STAT',25,'Statics pack','Angle problems (22), resultant by parallelogram law (19), three equilibrium forces (19).'),
+P('M2_REAL',20,'Inequalities pack','Inequalities with < or ≤ (24) and absolute-value inequalities (24).',12,1,0),
+L('P2_ATOM',35,'Atomic models & nuclear physics','Bohr model, spectra, radioactivity, half-life, binding energy, nuclear reactions.'),
+P('P2_ATOM',25,'Atomic & nuclear','MCQs, numericals and DU questions.',15,1,3),
+L('P2_STAT',20,'Static Electricity — part 2','Electric potential, capacitors, energy stored.'),
+P('C2_ORG',25,'Organic cards & conversions','Reaction-card recitation and conversions.',10,3,0),
+R('C1_CHG',20,'pH & equilibrium numericals','Redo your errors.',10,2,0),
+R('C2_ELEC',15,'Electrochemistry redo','Faraday and cell-potential numericals.',8,1,0),
+L('B2_LOC',25,'Locomotion — pack (102 DU)','Bones, joints, muscle types and contraction.'),
+L('B1_BIOT',25,'Biotechnology — pack (93 DU)','Genetic engineering, recombinant DNA, PCR, tissue culture, GMOs.')
+],{mock:[150,'FULL MOCK 1 — 60 MCQs / 45 min, then written / 45 min','Exam conditions: no phone, 0.25 penalty per wrong MCQ. Then spend 60 minutes reviewing every wrong or skipped question. Log it under Mocks.',60,4]});
+/* ---------- PHASE 3 ---------- */
+day(14,[
+R('M1_DIFF',30,'Differentiation — formula sheet & mixed set','Rewrite the derivative formulas from memory, then a mixed set.',10,1,2),
+R('M1_INT',30,'Integration — formula sheet & mixed set','Rewrite the standard integrals from memory, then a mixed set.',10,1,3),
+R('M1_MAT',25,'Matrices — quick redo','Redo your errors from the first two days.',10,1,0),
+L('M1_PNC',25,'Permutation & combination — pack','nPr/nCr rules, circular and restricted arrangements. 12 MCQs.',true),
+R('P1_NEW',25,'Newtonian Mechanics — formulas & MCQs','Formula sheet, then timed MCQs.',20,0,2),
+R('P1_VEC',20,'Vectors — formulas & MCQs','Formula sheet, then timed MCQs.',15,0,2),
+R('P1_WEP',20,'Work, Energy & Power — formulas & MCQs','Formula sheet, then timed MCQs.',15,0,2),
+L('P1_STR',15,'Structural properties — pack (Young’s modulus)','Stress, strain, Young’s modulus, Hooke’s law (46-MCQ cluster).',true),
+L('P1_WAVE',20,'Waves — pack (progressive waves)','Wave equation, speed, intensity (32-MCQ cluster).',true),
+R('C2_ORG',40,'Organic reaction cards — full pass','Carbonyl, aromatic, alkene, acid and amine cards. Recite reagent → product → condition aloud.'),
+P('C2_ORG',25,'Organic mixed + conversions','Mixed MCQs and conversions.',20,2,0),
+R('C1_QUAL',20,'Qualitative Chemistry — revision','Rapid pass, then MCQs and DU questions.',12,0,3),
+R('C1_BOND',20,'Bonding — revision','Hybridisation, VSEPR, bond angles; then MCQs and DU questions.',12,0,3),
+R('C1_CHG',15,'Chemical Change — revision','pH, pOH and buffer numericals.',10,1,0),
+R('B1_CELL',25,'Cell structure — revision','Diagrams and difference tables from memory.',10,0,0),
+R('B1_DIV',20,'Cell division — revision','Stage diagrams, mitosis vs meiosis.',8,0,0),
+R('B1_PHY',25,'Plant physiology — revision','Photosynthesis and respiration schemes.',10,0,0),
+R('B2_CLS',20,'Animal classification — revision','Phylum comparison table.',8,0,0)
+]);
+day(15,[
+R('M1_LINE',20,'Straight Line — revision','Formulas and a mixed set.',8,0,2),
+R('M1_TRIG',15,'Trigonometry — revision','Identities and a mixed set.',6,0,1),
+R('M2_INV',15,'Inverse trig — revision','Principal values and identities.',8,0,1),
+R('M2_POLY',15,'Polynomials — revision','Root–coefficient relations.',8,0,1),
+R('M2_CON',15,'Conics — revision','Parabola and ellipse elements.',8,0,1),
+R('P2_CUR',20,'Current Electricity — revision','Formulas and MCQs.',12,0,2),
+R('P2_THERMO',20,'Thermodynamics — revision','Formulas and MCQs.',12,0,2),
+R('P2_ATOM',10,'Atomic & nuclear — revision','Formulas and MCQs.',8,0,1),
+R('P2_STAT',10,'Static Electricity — revision','Formulas and MCQs.',8,0,1),
+R('C2_QUANT',15,'Quantitative — revision','Concentration and titration problems.',10,1,0),
+R('C2_ENV',15,'Gas laws & environmental — revision','Numericals and DO/BOD/COD.',10,1,0),
+R('C2_ELEC',10,'Electrochemistry — revision','Faraday and potential problems.',8,0,0),
+R('C1_CHG',10,'pH & equilibrium — revision','Numericals.',8,0,0),
+R('B2_GEN',10,'Genetics — revision','Cross problems.',6,0,0),
+R('B2_DIG',10,'Digestion — revision','Enzyme table and diagram.',6,0,0),
+R('B2_BLD',10,'Blood & circulation — revision','Diagrams and definitions.',6,0,0),
+R('B2_ANI',10,'Animal identity — revision','Comparison tables.',6,0,0)
+],{mock:[150,'FULL MOCK 2 — 60 MCQs / 45 min, then written / 45 min','Exam conditions again, with the 0.25 penalty. Compare your score with Mock 1 and note which subject moved. Log it under Mocks.',60,4]});
+day(16,[
+['MIX','revise',60,'Mock 2 review — every wrong and skipped question','Redo each one without looking at the answer. Write the cause in the error notebook, and add any weak chapter to the Mocks tab.'],
+WK('Math',40,0),WK('Math',40,1),WK('Physics',40,0),WK('Physics',40,1),WK('Chemistry',40,0),WK('Chemistry',40,1),WK('Biology',50,0),
+['MIX','flex',60,'Flex slot — catch-up','Automatically filled with any missed tasks.']
+]);
+day(17,[
+['MIX','revise',60,'Mock 3 review — every wrong and skipped question','Redo each one without looking at the answer. Note only the causes you can still fix in two days.'],
+['ALL:Math','revise',25,'Formula & identity sheet — Higher Math','Calculus, straight line, trig, polynomial, conics, complex: one page, from memory.'],
+['ALL:Physics','revise',25,'Formula sheet — Physics 1st & 2nd','Mechanics, energy, gravitation, SHM, current electricity, thermodynamics.'],
+['ALL:Chemistry','revise',35,'Reaction cards & key definitions — Chemistry','Organic reagents/conditions, bonding shapes, pH formulas, concentration formulas.'],
+['ALL:Biology','revise',25,'Diagrams, definitions & tables — Biology','Cell, genetics, digestion, blood, classification.'],
+['MIX','revise',40,'Re-solve DU questions from your two weakest chapters per subject','Use the Chapters and Errors tabs to pick them.'],
+['MIX','errlog',40,'Full error-notebook pass','Read every unresolved item once. Resolve the ones you now get right.']
+],{skip:true,mock:null});
+/* Mock 3 is the morning block of day 17 */
+add(17,'MIX','mock',150,'FULL MOCK 3 — 60 MCQs / 45 min, then written / 45 min','Strict timing, 0.25 penalty. This is your last full rehearsal. Log it under Mocks.',60,4,0);
+day(18,[
+['ALL:Math','revise',30,'Light pass — Higher Math formulas','Read the formula sheet once. No new problems.'],
+['ALL:Physics','revise',30,'Light pass — Physics formulas','Read the formula sheet once. A few DU questions only.'],
+['ALL:Chemistry','revise',30,'Light pass — reaction cards & definitions','Read the cards once; no new topics.'],
+['ALL:Biology','revise',25,'Light pass — diagrams & definitions','Skim your tables.'],
+['MIX','errlog',25,'Final error-log skim','Read only the items you have resolved twice or marked important.'],
+['MIX','other',10,'Logistics: admit card, ID, pens, route, bag','Prepare tonight. Stop studying by 18:00 and sleep by 22:30.']
+],{skip:true});
+const DAYNOTE=['Backlog day: Matrices, Physical World, Cell structure, Organic Lecture 1','Matrices finish, Vectors, Isomerism, Cell structure 2','Straight Line, Dynamics, Electronic effects, pH & pOH, Mitosis','Straight Line 2, Newtonian Mechanics 1, Alkanes/alkenes, Buffers, Meiosis','Differentiation 1, Newtonian 2, Alkynes & halides, Periodic properties, Animal classification','Differentiation 2, Work & Energy, Aromatics, Photosynthesis','Checkpoint + flex: Differentiation 3, Power, Alcohols, Respiration. Mini-mock','Integration 1, Gravitation, Carbonyls 1, Gas laws, Genetics 1','Integration 2, Periodic Motion, Carbonyls 2, Environmental, Genetics 2','Inverse trig, Current Electricity 1, Acids & amines, Concentration problems, Digestion','Polynomials, Current Electricity 2, Conversions, Redox & acid–base titration, Blood. Sectional mock','Conics, Thermodynamics 1, Organic timed set, Electrochemistry, Animal identity','Complex & Binomial, Thermo 2 + Static Elec, Chem-1 DU sets, Gymnosperms & Microbes','Mechanics & inequalities, Atomic & Nuclear, Organic cards. FULL MOCK 1','Revision 1: calculus, mechanics formulas, organic cards, cell biology','FULL MOCK 2 + short revision of all Tier 1–2 chapters','Mock 2 review + weak-chapter repair (auto-picked from your errors)','FULL MOCK 3 + formula and reaction sheets','Light revision only. Stop early, sleep early'];
+const PHASES=[{n:'Phase 1',name:'Foundation & backlog clearance',from:'2026-11-23',to:'2026-11-29',obj:'Clear backlogs, build foundations in weak subjects, start high-priority chapters, begin daily MCQs.'},
+{n:'Phase 2',name:'High-yield coverage',from:'2026-11-30',to:'2026-12-06',obj:'Cover the Tier 1–2 chapters, practise DU questions, continue Organic, increase timed MCQs.'},
+{n:'Phase 3',name:'Final revision & mocks',from:'2026-12-07',to:'2026-12-11',obj:'Formulas, reactions, error notebook, timed mocks. No big new chapters.'}];
+const phaseOf=d=>PHASES.find(p=>d>=p.from&&d<=p.to)||null;
+/* ================= STATE ================= */
+const PLANV=2;
+const defaults=()=>({v:1,plan:PLANV,done:{},moved:{},dropped:{},dropInfo:{},carry:{},auto:[],autoSeq:0,autoGen:{},checkins:{},errors:[],mocks:[],chStatus:{},settings:{override:'',mode:'auto'},lastAdjust:null});
+const loaded=Store.load()||{};
+let S=Object.assign(defaults(),loaded);
+let MIGRATED=false;
+if(Object.keys(loaded).length&&loaded.plan!==PLANV){MIGRATED=Object.keys(loaded.done||{}).length>0;S=Object.assign(defaults(),{errors:loaded.errors||[],mocks:loaded.mocks||[],settings:loaded.settings||{},checkins:loaded.checkins||{}});}
+S.settings=Object.assign({override:'',mode:'auto'},S.settings||{});
+const UI={flash:'',tab:'today',planSel:null,aPaper:'P1',aSort:'score',aDir:-1,chFilter:'All',errFilter:'open',draft:{},ciOpen:false,resetOpen:false};
+if(MIGRATED)UI.flash='Plan updated with your verified data. The task list changed, so earlier task ticks were reset (errors, mocks and check-ins were kept).';
+function save(){Store.save(S);}
+const today=()=>S.settings.override||toKey(new Date());
+function curDay(){const t=today();return t<START?START:(t>END?END:t);}
+function allT(){return TASKS.concat(S.auto).filter(t=>!S.dropped[t.id]).map(t=>Object.assign({},t,{eff:S.moved[t.id]||t.date}));}
+function byId(id){return TASKS.find(t=>t.id===id)||S.auto.find(t=>t.id===id);}
+function subjOf(t){const c=CH[t.ch];if(c)return c.s;const m=/^(WEAK|ALL):(.+)$/.exec(t.ch||'');return m?m[2]:'Mixed';}
+function tierOf(t){const c=CH[t.ch];return c?c.tier:null;}
+/* ---------- adaptive helpers ---------- */
+function weakScore(id){const e=S.errors.filter(x=>x.ch===id&&!x.resolved).length;const m=S.mocks.reduce((a,k)=>a+(k.weak1===id?1:0)+(k.weak2===id?1:0),0);return e+2*m;}
+function autoStatus(id){
+ const ts=allT().filter(t=>t.ch===id);if(!ts.length)return 0;
+ if(!ts.some(t=>S.done[t.id]))return 0;
+ const groups=[['learn',2],['mcq',3],['du',4],['revise',5]];let st=1;
+ for(const g of groups){const k=ts.filter(t=>t.kind===g[0]);if(!k.length)continue;if(k.every(t=>S.done[t.id]))st=g[1];else break;}
+ return st;
+}
+function statusOf(id){const o=S.chStatus[id];return (o!==undefined&&o!=='auto')?+o:autoStatus(id);}
+function pickWeak(subj,slot){
+ const cs=CHAPS.filter(c=>c.s===subj);
+ const w=cs.filter(c=>weakScore(c.id)>0).sort((a,b)=>weakScore(b.id)-weakScore(a.id));
+ const fb=cs.filter(c=>c.tier<=2&&w.indexOf(c)<0&&allT().some(t=>t.ch===c.id)).sort((a,b)=>statusOf(a.id)-statusOf(b.id)||a.tier-b.tier);
+ const list=w.concat(fb);return (list[slot]||list[0]||{}).id;
+}
+function prio(t){const c=CH[t.ch];let w=c?(5-c.tier)*10:3;
+ const kw={learn:6,mcq:4,du:4,revise:3,weak:5,mock:9,spaced:1,errlog:2,mixed:2,flex:0,other:1}[t.kind];
+ return w+(kw==null?2:kw)+(t.opt?-8:0)+(t.boost||0)+(c?Math.min(weakScore(t.ch),5):0);}
+function perf(){
+ if(S.settings.mode!=='auto')return {mode:S.settings.mode,why:'set manually in More'};
+ const ks=Object.keys(S.checkins).filter(k=>S.checkins[k].submitted).sort().slice(-2);
+ const r=ks.map(k=>{const c=S.checkins[k];return c.plan?c.doneMin/c.plan:1;});
+ if(r.length>=2){if(r.every(x=>x<0.65))return {mode:'lite',why:'your last 2 check-ins were under 65% complete'};if(r.every(x=>x>=0.98))return {mode:'push',why:'you finished your last 2 days in full'};}
+ return {mode:'normal',why:''};
+}
+const capFor=()=>({lite:430,normal:480,push:520}[perf().mode]||480);
+const carryLimit=()=>({lite:60,normal:90,push:120}[perf().mode]||90);
+function startDate(){const t=today();const c=S.checkins[t];let sd=(c&&c.submitted)?addDays(t,1):t;if(sd<START)sd=START;return sd;}
+const LASTPLACE='2026-12-09';
+function place(t,sd){
+ const p=prio(t),cap=capFor(),cl=carryLimit();
+ for(let d=sd;d<=LASTPLACE;d=addDays(d,1)){
+  const tasks=allT().filter(x=>x.eff===d&&x.id!==t.id);
+  const load=tasks.reduce((a,x)=>a+x.mins,0);
+  const carried=tasks.filter(x=>S.moved[x.id]===d).reduce((a,x)=>a+x.mins,0);
+  if(carried+t.mins>cl)continue;
+  if(load+t.mins<=cap){S.moved[t.id]=d;return d;}
+  const drops=tasks.filter(x=>!S.done[x.id]&&(x.opt||x.kind==='flex'||(x.kind==='revise'&&prio(x)+10<=p))&&prio(x)<p).sort((a,b)=>prio(a)-prio(b));
+  let l=load;const ch=[];
+  for(const x of drops){if(l+t.mins<=cap)break;l-=x.mins;ch.push(x);}
+  if(l+t.mins<=cap){ch.forEach(x=>{S.dropped[x.id]=true;S.dropInfo[x.id]={why:'Made room for a higher-priority task',on:today()};});S.moved[t.id]=d;return d;}
+ }
+ return null;
+}
+function rebalance(){
+ const msgs=[];const sd=startDate();const t0=today();
+ if(t0<START||sd>LASTPLACE)return msgs;
+ const skipKinds=['mixed','spaced','errlog','mock','flex','weak','other'];
+ let missed=allT().filter(t=>!S.done[t.id]&&t.eff<sd&&skipKinds.indexOf(t.kind)<0);
+ missed.forEach(t=>{S.carry[t.id]=(S.carry[t.id]||0)+1;});
+ missed.sort((a,b)=>prio(b)-prio(a)||(a.eff<b.eff?-1:1));
+ const toPlace=[];
+ missed.forEach(t=>{
+  if((S.carry[t.id]||0)>=2&&t.mins>=40&&!t.part&&(t.kind==='learn'||t.kind==='revise')){
+   const a=Math.ceil(t.mins/2/5)*5,b=t.mins-a;
+   const mk=(mins,label,half)=>({id:'a'+(++S.autoSeq),date:sd,ch:t.ch,kind:t.kind,mins:mins,title:t.title+' — '+label,detail:t.detail+' ('+half+')',m:Math.round(t.m/2),w:Math.round(t.w/2),d:Math.round(t.d/2),opt:t.opt,slot:t.slot,part:true,carryFrom:t.date});
+   const A=mk(a,'part 1 of 2','first half of the topic list'),B=mk(b,'part 2 of 2','second half of the topic list');
+   S.auto.push(A,B);S.dropped[t.id]=true;S.dropInfo[t.id]={why:'Split into two smaller tasks',on:t0};
+   msgs.push('Split “'+t.title+'” into two shorter parts (missed twice).');
+   toPlace.push(A,B);
+  }else toPlace.push(t);
+ });
+ toPlace.forEach(t0b=>{
+  const t=Object.assign({},t0b,{eff:t0b.eff||t0b.date});
+  const d=place(t,sd);
+  if(d){msgs.push('Moved “'+t.title+'” to '+fmt(d)+'.');}
+  else{
+   const c=CH[t.ch];
+   if(c&&c.tier>=3){S.dropped[t.id]=true;S.dropInfo[t.id]={why:'Low priority and no space left',on:t0};msgs.push('Postponed low-priority “'+t.title+'” (no space left). Restore it in Plan if you get time.');}
+   else{
+    const over=allT().filter(x=>x.eff===LASTPLACE&&x.id!==t.id).reduce((a,x)=>a+x.mins,0)+t.mins-capFor();
+    if(over<=90){S.moved[t.id]=LASTPLACE;msgs.push('Squeezed “'+t.title+'” into '+fmt(LASTPLACE)+' (high priority, last free day).');}
+    else{S.dropped[t.id]=true;S.dropInfo[t.id]={why:'Not enough days left. Restore it if you catch up',on:t0};msgs.push('Not enough days left for “'+t.title+'”. It is parked in Plan → Postponed; restore it if you get ahead.');}
+   }
+  }
+ });
+ if(perf().mode==='lite'){
+  [sd,addDays(sd,1)].forEach(d=>{
+   if(d>LASTPLACE)return;
+   let tasks=allT().filter(x=>x.eff===d);let load=tasks.reduce((a,x)=>a+x.mins,0);
+   const dr=tasks.filter(x=>!S.done[x.id]&&(x.opt||x.kind==='flex')).sort((a,b)=>prio(a)-prio(b));
+   for(const x of dr){if(load<=capFor())break;load-=x.mins;S.dropped[x.id]=true;S.dropInfo[x.id]={why:'Lite mode: lighter load while you catch up',on:t0};msgs.push('Lite mode: postponed optional “'+x.title+'”.');}
+  });
+ }
+ return msgs;
+}
+function genAdaptive(){
+ const msgs=[];const sd=startDate();if(today()<START||sd>LASTPLACE)return msgs;
+ CHAPS.forEach(c=>{
+  if(weakScore(c.id)<3)return;
+  const ex=S.auto.find(a=>a.autoKey==='err-'+c.id&&!S.done[a.id]&&!S.dropped[a.id]);if(ex)return;
+  const last=S.autoGen[c.id];if(last&&diff(sd,last)<2)return;
+  const errs=S.errors.filter(x=>x.ch===c.id&&!x.resolved).slice(0,3).map(x=>x.text.slice(0,50)).join(' | ');
+  const t={id:'a'+(++S.autoSeq),date:sd,ch:c.id,kind:'revise',mins:30,title:'Targeted repair — '+c.name,detail:'Redo every unresolved error for this chapter'+(errs?' ('+errs+')':'')+', then 10 fresh MCQs and 2 DU questions.',m:10,w:0,d:2,opt:false,slot:0,auto:true,autoKey:'err-'+c.id,boost:8};
+  S.auto.push(t);S.autoGen[c.id]=sd;
+  const d=place(Object.assign({},t,{eff:t.date}),sd);
+  if(d)msgs.push('Added 30 min of targeted repair for '+c.name+' on '+fmt(d)+' (repeated errors).');
+  else{S.auto.pop();delete S.autoGen[c.id];}
+ });
+ return msgs;
+}
+function runAdjust(note){
+ const m=rebalance().concat(genAdaptive());
+ if(m.length){S.lastAdjust={on:today(),msgs:m.slice(0,8)};}
+ else if(note){S.lastAdjust={on:today(),msgs:['Nothing needed to move. Your plan is on track.']};}
+ save();return m;
+}
+/* ---------- stats ---------- */
+function resolve(t){
+ const o=Object.assign({},t);
+ if(t.kind==='weak'){const subj=(/^WEAK:(.+)$/.exec(t.ch)||[])[1];const id=pickWeak(subj,t.slot||0);const c=CH[id];o.chId=id;o.title='Weak-spot repair — '+(c?c.name:subj);
+  o.detail='Open your Errors tab for this chapter and redo every unresolved item. Re-solve 10 chapter MCQs you missed and 3 DU questions. Then write the formula or reaction sheet from memory.'+(weakScore(id)>0?'':' (Picked by tier and status: no errors logged for it yet.)');}
+ if(t.kind==='mixed'&&perf().mode==='push'){o.m=t.m+10;o.title='Timed mixed MCQs — '+o.m+' questions (challenge: 40 s each)';}
+ if(t.kind==='spaced'){const list=spacedFor(t.eff);const due=S.errors.filter(e=>!e.resolved&&errDue(e)<=t.eff).length;
+  o.detail=(list.length?'Due now: '+list.join('; ')+'. ':'No chapter is due for review yet. Re-read yesterday’s formula page and 5 flashcards. ')+(due?due+' error-notebook item'+(due===1?'':'s')+' due for a redo (Errors tab).':'No error items due.');}
+ return o;
+}
+function spacedFor(date){
+ const out=[];
+ CHAPS.forEach(c=>{const ls=allT().filter(t=>t.ch===c.id&&t.kind==='learn');if(!ls.length||!ls.every(t=>S.done[t.id]))return;
+  const last=ls.map(t=>S.done[t.id]).sort().pop();const age=diff(date,last);if(age===1||age===3||age===7)out.push(c.name+' ('+age+'-day review)');});
+ return out;
+}
+const INTERVALS=[1,3,7];
+function errDue(e){return addDays(e.last||e.date,INTERVALS[Math.min(e.rev||0,2)]);}
+function dayTasks(d){return allT().filter(t=>t.eff===d).sort((a,b)=>ORDER.indexOf(subjOf(a))-ORDER.indexOf(subjOf(b)));}
+function dayStats(d){
+ const ts=dayTasks(d).map(resolve);let planned=0,doneMin=0,m=0,w=0,du=0;
+ ts.forEach(t=>{planned+=t.mins;m+=t.m;w+=t.w;du+=t.d;if(S.done[t.id])doneMin+=t.mins;});
+ return {planned:planned,doneMin:doneMin,pct:planned?Math.round(doneMin/planned*100):0,m:m,w:w,d:du,n:ts.length};
+}
+function overall(){const ts=allT();let p=0,d=0;ts.forEach(t=>{p+=t.mins;if(S.done[t.id])d+=t.mins;});return {planned:p,done:d,pct:p?Math.round(d/p*100):0};}
+function actualOn(d){
+ const ci=S.checkins[d]||{};let m=0,w=0,du=0,mins=0;
+ Object.keys(S.done).forEach(id=>{if(S.done[id]===d){const t=byId(id);if(t){m+=t.m||0;w+=t.w||0;du+=t.d||0;mins+=t.mins;}}});
+ const has=v=>v!==undefined&&v!==null&&v!=='';
+ return {hours:has(ci.hours)?+ci.hours:mins/60,m:has(ci.m)?+ci.m:m,c:has(ci.c)?+ci.c:0,w:has(ci.w)?+ci.w:w,d:has(ci.d)?+ci.d:du,mins:mins};
+}
+/* ================= RENDER HELPERS ================= */
+const bar=(p,col)=>'<div class="bar"><i style="width:'+Math.max(0,Math.min(100,p))+'%'+(col?';background:'+col:'')+'"></i></div>';
+function dv(id,def){return UI.draft[id]!==undefined?UI.draft[id]:(def==null?'':def);}
+function chOptions(sel,withGeneral){
+ let h=withGeneral?'<option value="">General / no chapter</option>':'<option value="">Select chapter…</option>';
+ ['Physics','Chemistry','Biology','Math'].forEach(s=>{h+='<optgroup label="'+SUB[s].label+'">';
+  CHAPS.filter(c=>c.s===s).forEach(c=>{h+='<option value="'+c.id+'"'+(sel===c.id?' selected':'')+'>'+esc(PAPERS[c.p][1].replace(' Paper','').replace('Higher Math','Math')+' — '+c.name)+'</option>';});h+='</optgroup>';});
+ return h;
+}
+function taskHTML(t0){
+ const t=resolve(t0);const done=!!S.done[t.id];const sj=subjOf(t);const cid=t.chId||t.ch;const c=CH[cid];
+ const chips=['<span class="chip">'+KIND[t.kind]+'</span>'];
+ if(c){chips.push('<span class="chip">'+esc(PAPERS[c.p][1].replace(' Paper',''))+' · '+esc(c.name)+'</span>');chips.push('<span class="chip '+(c.tier===1?'t1':'')+'">Tier '+c.tier+'</span>');}
+ if(t.opt)chips.push('<span class="chip">Optional</span>');
+ if(t.m)chips.push('<span class="chip">'+t.m+' MCQs</span>');if(t.w)chips.push('<span class="chip">'+t.w+' written</span>');if(t.d)chips.push('<span class="chip">'+t.d+' DU</span>');
+ if(!done&&t.eff<today())chips.push('<span class="chip bad">Missed</span>');
+ if(t.eff!==t.date&&!t.part)chips.push('<span class="chip warn">Moved from '+fmtS(t.date)+'</span>');
+ if(t.part)chips.push('<span class="chip warn">Split task</span>');
+ if(t.auto&&!t.part)chips.push('<span class="chip warn">Added by coach</span>');
+ const why=(t.kind==='learn'&&c)?'<div class="why">Why: '+esc(c.why)+'</div>':'';
+ return '<div class="task'+(done?' done':'')+'" style="--sc:'+SUB[sj].color+'"><input type="checkbox" data-chg="toggle" data-id="'+t.id+'" aria-label="Mark done"'+(done?' checked':'')+'><div class="tb"><div class="tt">'+esc(t.title)+'</div><div style="margin-top:4px">'+chips.join('')+'</div>'+(t.detail?'<div class="td">'+esc(t.detail)+'</div>':'')+why+'</div><div class="dur">'+t.mins+' min</div></div>';
+}
+function groupsHTML(d){
+ const ts=dayTasks(d);if(!ts.length)return '<div class="card mut">No tasks on this day.</div>';
+ let h='';
+ ORDER.forEach(s=>{const g=ts.filter(t=>subjOf(t)===s);if(!g.length)return;
+  const mins=g.reduce((a,t)=>a+t.mins,0),dm=g.filter(t=>S.done[t.id]).reduce((a,t)=>a+t.mins,0);
+  h+='<div class="sg" style="--sc:'+SUB[s].color+'"><b>'+SUB[s].label+'</b><span class="mut">'+dm+'/'+mins+' min · suggested '+SUB[s].time+'</span></div>';
+  g.forEach(t=>{h+=taskHTML(t);});});
+ return h;
+}
+/* ================= VIEWS ================= */
+function viewToday(){
+ const t=today(),d=curDay(),before=t<START,after=t>END;
+ const dleft=diff(EXAM,t);const st=dayStats(d);const ov=overall();const ph=phaseOf(d);const dn=diff(d,START)+1;
+ let h='';
+ if(!Store.ok)h+='<div class="card coach warn"><b>Progress is not being saved in this view.</b><p class="sm">This preview blocks browser storage, so progress resets when you close it. Download <i>du-dashboard.html</i>, open it in Chrome on your phone and use “Add to Home screen”. Until then, use More → Backup to copy your progress.</p></div>';
+ if(t===EXAM)return h+'<div class="card hero"><div class="big">Exam day. Good luck.</div><p>Morning only: one page per subject (formulas, reaction cards, key definitions). Nothing new. Eat, drink water, arrive early with your admit card and ID. Remember: 0.25 off per wrong MCQ, so skip anything you cannot narrow to two options.</p></div>';
+ if(after)return h+'<div class="card hero"><div class="big">The exam date has passed.</div><p>Use the Plan tab to look back over your preparation.</p></div>';
+ h+='<div class="card hero"><div class="row"><div><div class="mut">DU Science Unit · 12 December 2026</div><div class="big">'+(before?diff(EXAM,START):dleft)+' days to go</div></div><div style="text-align:right"><b>'+fmt(t)+'</b><div class="mut">'+(before?'Plan starts '+fmt(START):'Day '+dn+' of 19')+'</div></div></div>';
+ if(ph)h+='<div class="mut" style="margin-top:6px"><b>'+ph.n+': '+ph.name+'</b> — '+ph.obj+'</div>';
+ h+='<div class="grid4"><div class="stat"><span class="mut">Target today</span><b>'+round1(st.planned/60)+' h</b></div><div class="stat"><span class="mut">Done</span><b>'+round1(st.doneMin/60)+' h</b></div><div class="stat"><span class="mut">Day complete</span><b>'+st.pct+'%</b></div><div class="stat"><span class="mut">Overall</span><b>'+ov.pct+'%</b></div></div>';
+ h+='<div style="margin-top:10px">'+bar(st.pct)+'</div></div>';
+ if(before)h+='<div class="card coach"><b>Showing Day 1.</b><p class="sm">Today is before 23 November. You can start early with these tasks.</p></div>';
+ h+=coachHTML(d,st);
+ const next=dayTasks(d).map(resolve).find(x=>!S.done[x.id]);
+ h+='<div class="card"><div class="row"><div><div class="mut">'+DAYNOTE[diff(d,START)]+'</div><div class="mut" style="margin-top:4px">Targets: <b>'+st.m+'</b> MCQs · <b>'+st.w+'</b> written · <b>'+st.d+'</b> DU questions</div></div></div>'+(next?'<div class="why" style="margin-top:8px">Start here: <b>'+esc(next.title)+'</b> ('+next.mins+' min)</div>':'<div class="why" style="margin-top:8px">All tasks done. Fill in the check-in below.</div>')+'</div>';
+ h+='<details class="card"><summary>Daily routine (suggested)</summary><ul class="t sm"><li>07:00–08:50 Higher Math</li><li>09:10–10:50 Physics</li><li>10:50–12:30 Break, lunch, walk</li><li>12:30–14:30 Chemistry (Organic first)</li><li>15:00–16:30 Biology</li><li>16:30–19:00 Rest, exercise, dinner</li><li>19:30–20:30 Mixed MCQs, spaced revision, error log</li><li>20:30 Check-in, then wind down. Sleep 23:00–06:30.</li></ul></details>';
+ h+=groupsHTML(d);
+ if(d===t||before)h+=checkinHTML(d);
+ return h;
+}
+function coachHTML(d,st){
+ const msgs=[],warns=[];const pf=perf();
+ if(pf.mode==='lite')warns.push('<b>Lite mode:</b> '+(pf.why||'')+'. Optional tasks are postponed and carry-over is capped so you can recover without burning out.');
+ if(pf.mode==='push')msgs.push('<b>Push mode:</b> '+pf.why+'. Mixed MCQ sets are bigger and faster (40 s per question).');
+ if(S.lastAdjust&&S.lastAdjust.msgs.length&&S.lastAdjust.on>=addDays(today(),-1))msgs.push('<b>Plan adjusted</b> ('+fmtS(S.lastAdjust.on)+'):<ul class="t">'+S.lastAdjust.msgs.map(m=>'<li>'+esc(m)+'</li>').join('')+'</ul>');
+ const wk=CHAPS.filter(c=>weakScore(c.id)>=2).sort((a,b)=>weakScore(b.id)-weakScore(a.id)).slice(0,3);
+ if(wk.length)msgs.push('<b>Weak spots:</b> '+wk.map(c=>esc(c.name)+' ('+weakScore(c.id)+')').join(', ')+'. Repair time is added automatically.');
+ const due=S.errors.filter(e=>!e.resolved&&errDue(e)<=today()).length;
+ if(due)msgs.push('<b>'+due+' error-notebook item'+(due===1?'':'s')+' due for a redo.</b> Open the Errors tab.');
+ const over=DAYS.filter(x=>x>=startDate()&&x<=LASTPLACE&&dayStats(x).planned>capFor()+30);
+ if(over.length)warns.push('<b>Heavy days ahead:</b> '+over.map(fmtS).join(', ')+'. Tasks stay, but expect to trim optional items.');
+ if(d==='2026-12-03')warns.push('<b>Decision point today:</b> check the circular. If your department needs only Biology or only Math, cut the other to 45 min a day.');
+ let h='';
+ if(warns.length)h+='<div class="card coach warn">'+warns.map(x=>'<p>'+x+'</p>').join('')+'</div>';
+ if(msgs.length)h+='<div class="card coach">'+msgs.map(x=>'<p>'+x+'</p>').join('')+'</div>';
+ return h;
+}
+function checkinHTML(d){
+ const c=S.checkins[d]||{};const st=dayStats(d);
+ const f=(id,k,lab,ph)=>'<div><label class="f">'+lab+'</label><input id="'+id+'" data-draft="1" inputmode="decimal" placeholder="'+ph+'" value="'+esc(dv(id,c[k]))+'"></div>';
+ return '<div class="card"><div class="row"><h3>End-of-day check-in</h3>'+(c.submitted?'<span class="chip good">Saved</span>':'')+'</div>'+
+ '<p class="mut sm">Done today: '+st.pct+'% ('+round1(st.doneMin/60)+' of '+round1(st.planned/60)+' h). Anything unfinished is re-planned for you.</p>'+
+ '<div class="three">'+f('ci_h','hours','Actual hours','e.g. 7.5')+f('ci_m','m','MCQs attempted','')+f('ci_c','c','MCQs correct','')+'</div>'+
+ '<div class="two">'+f('ci_w','w','Written practised','')+f('ci_d','d','DU questions solved','')+'</div>'+
+ '<label class="f">Difficult topics</label><textarea id="ci_hard" data-draft="1" placeholder="e.g. Carbonyl mechanisms, Kirchhoff sign convention">'+esc(dv('ci_hard',c.hard))+'</textarea>'+
+ '<div style="margin-top:10px"><button class="btn" data-act="checkin">'+(c.submitted?'Update check-in & re-plan':'Save check-in & plan tomorrow')+'</button></div></div>';
+}
+function viewPlan(){
+ const t=today();const sel=UI.planSel||curDay();
+ let h='<h2>19-day plan</h2><div class="card"><div class="cal">'+['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(x=>'<div class="h">'+x+'</div>').join('');
+ const cells=DAYS.concat([EXAM]);
+ cells.forEach(k=>{
+  const isE=k===EXAM;const st=isE?null:dayStats(k);let cls='cell';
+  if(isE)cls+=' exam';else if(k<t&&st.pct<50)cls+=' miss';else if(st.pct>=90)cls+=' ok';else if(st.pct>0)cls+=' part';
+  if(k===t)cls+=' today';if(k===sel)cls+=' sel';
+  h+='<button class="'+cls+'" data-act="selday" data-d="'+k+'"><b>'+parse(k).getUTCDate()+'</b><small>'+(isE?'EXAM':st.pct+'%')+'</small></button>';
+ });
+ h+='</div><p class="mut sm" style="margin-top:8px">Green = 90%+ done · amber = partly done · red = past and under 50% · outlined = today.</p></div>';
+ if(sel===EXAM){h+='<div class="card hero"><b>Saturday 12 December — exam day.</b><p>Morning: one page per subject, nothing new.</p></div>';}
+ else{
+  const ph=phaseOf(sel);const st=dayStats(sel);
+  h+='<div class="card"><div class="row"><div><h3>'+fmt(sel)+'</h3><div class="mut">'+(ph?ph.n+' · ':'')+DAYNOTE[diff(sel,START)]+'</div></div><div style="text-align:right"><b>'+st.pct+'%</b><div class="mut">'+round1(st.planned/60)+' h planned</div></div></div>'+bar(st.pct)+'</div>'+groupsHTML(sel);
+ }
+ const dr=TASKS.concat(S.auto).filter(x=>S.dropped[x.id]);
+ if(dr.length){h+='<h2>Postponed or replaced tasks</h2>';dr.forEach(x=>{const info=S.dropInfo[x.id]||{};h+='<div class="card row"><div><div class="tt">'+esc(x.title||KIND[x.kind])+'</div><div class="mut sm">'+fmtS(x.date)+' · '+x.mins+' min · '+esc(info.why||'Postponed')+'</div></div><button class="btn ghost sm" data-act="restore" data-id="'+x.id+'">Restore</button></div>';});}
+ return h;
+}
+function viewChapters(){
+ const flt=UI.chFilter;let h='<h2>Chapter tracker</h2><div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px">'+['All','Physics','Chemistry','Biology','Math'].map(s=>'<button class="tab'+(flt===s?' on':'')+'" data-act="chf" data-s="'+s+'">'+(s==='Math'?'Higher Math':s)+'</button>').join('')+'</div>';
+ h+='<p class="mut sm">Status updates automatically as you complete tasks (Learn → MCQs → DU + written → Revise). Change it manually if you disagree. “Mastered” is manual only.</p>';
+ ['Physics','Chemistry','Biology','Math'].forEach(s=>{
+  if(flt!=='All'&&flt!==s)return;
+  const cs=CHAPS.filter(c=>c.s===s);const tot=cs.filter(c=>allT().some(t=>t.ch===c.id));
+  const avg=tot.length?Math.round(tot.reduce((a,c)=>a+Math.min(statusOf(c.id),5),0)/tot.length/5*100):0;
+  h+='<div class="sg" style="--sc:'+SUB[s].color+'"><b>'+SUB[s].label+'</b><span class="mut">'+tot.length+' chapters in plan · '+avg+'% average</span></div>';
+  cs.forEach(c=>{
+   const st=statusOf(c.id);const ts=allT().filter(t=>t.ch===c.id);const dn=ts.filter(t=>S.done[t.id]).length;const inPlan=ts.length>0;const auto=autoStatus(c.id);
+   const manual=S.chStatus[c.id]!==undefined&&S.chStatus[c.id]!=='auto';
+   h+='<div class="card" style="border-left:4px solid '+SUB[s].color+'"><div class="row"><div><div class="tt">'+esc(c.name)+'</div><div class="mut sm">'+PAPERS[c.p][1]+'</div></div><span class="chip '+(c.tier===1?'t1':'')+'">Tier '+c.tier+'</span></div>'+
+   '<div class="mut sm" style="margin:4px 0">'+(c.mcq!=null?'MCQ '+c.mcq+' · Written '+c.w+' · DU '+c.du:(c.du!=null?'DU '+c.du+' · Total (all universities) '+c.tot:'No question statistics supplied'))+(inPlan?' · '+dn+'/'+ts.length+' tasks done':' · Not scheduled (select a status manually if you study it)')+'</div>'+bar(Math.min(st,5)/5*100,SUB[s].color)+
+   '<div style="margin-top:8px"><select data-chg="chstatus" data-id="'+c.id+'"><option value="auto"'+(manual?'':' selected')+'>Auto: '+STAT[auto]+'</option>'+STAT.map((x,i)=>'<option value="'+i+'"'+(manual&&+S.chStatus[c.id]===i?' selected':'')+'>'+x+'</option>').join('')+'</select></div></div>';
+  });});
+ return h;
+}
+function viewAnalysis(){
+ const p=UI.aPaper;let h='<h2>Question analysis</h2><select data-chg="apaper">'+Object.keys(PAPERS).map(k=>'<option value="'+k+'"'+(p===k?' selected':'')+'>'+PAPERS[k][1]+'</option>').join('')+'<option value="ALL"'+(p==='ALL'?' selected':'')+'>All papers with data — top chapters</option></select>';
+ if(p==='B1'||p==='B2'){
+  const bk=['name','du','tot','tier'].indexOf(UI.aSort)>=0?UI.aSort:'du';
+  const bd=(UI.aSort===bk)?UI.aDir:-1;
+  const bs=CHAPS.filter(c=>c.p===p).sort((a,b)=>{const x=a[bk],y=b[bk];return (typeof x==='string'?x.localeCompare(y):x-y)*bd;});
+  h+='<div class="card coach"><p class="sm">'+NOTES.B+'</p></div>';
+  const th2=(k,l)=>'<th data-act="asort" data-k="'+k+'">'+l+(bk===k?(bd>0?' ▲':' ▼'):'')+'</th>';
+  h+='<div class="card scroll"><table><tr><th>#</th>'+th2('name','Chapter')+th2('du','DU')+th2('tot','Total')+th2('tier','Tier')+'</tr>';
+  bs.forEach((c,i)=>{h+='<tr><td>'+(i+1)+'</td><td>'+esc(c.name)+'</td><td><b>'+c.du+'</b></td><td>'+c.tot+'</td><td>T'+c.tier+'</td></tr>';});
+  h+='</table></div>';
+  const bm=Math.max.apply(null,bs.map(c=>c.du));
+  h+='<div class="card"><h3>DU questions</h3>'+bs.map(c=>'<div class="hb"><span title="'+esc(c.name)+'">'+esc(c.name)+'</span>'+bar(c.du/bm*100,'var(--bio)')+'<span>'+c.du+'</span></div>').join('')+'</div>';
+  return h;
+ }
+ let rows=(p==='ALL'?CHAPS.filter(c=>c.mcq!=null):CHAPS.filter(c=>c.p===p));
+ const key=UI.aSort,dir=UI.aDir;
+ const val=c=>key==='score'?score(c):key==='name'?c.name:key==='w'?c.w:c[key];
+ rows=rows.slice().sort((a,b)=>{const x=val(a),y=val(b);if(x==null&&y==null)return 0;if(x==null)return 1;if(y==null)return -1;return (typeof x==='string'?x.localeCompare(y):x-y)*dir;});
+ if(p==='ALL')rows=rows.slice(0,20);
+ h+='<div class="card coach"><p class="sm">'+(NOTES[p]||'Scores are MCQ + 3×Written + 2×DU. Different papers come from different analyses, so compare across papers loosely.')+'</p><p class="sm">Historical frequency guides priorities; it does not predict the 2026 paper.</p></div>';
+ const th=(k,l)=>'<th data-act="asort" data-k="'+k+'">'+l+(key===k?(dir>0?' ▲':' ▼'):'')+'</th>';
+ h+='<div class="card scroll"><table><tr><th>#</th>'+th('name','Chapter')+th('mcq','MCQ')+th('w','Writ.')+th('du','DU')+th('stars','★')+th('score','Score')+th('tier','Tier')+'</tr>';
+ rows.forEach((c,i)=>{h+='<tr><td>'+(i+1)+'</td><td>'+esc(c.name)+(p==='ALL'?' <span class="mut">('+PAPERS[c.p][1].replace(' Paper','')+')</span>':'')+'</td><td>'+c.mcq+'</td><td>'+c.w+'</td><td>'+c.du+'</td><td>'+(c.stars||'—')+'</td><td><b>'+score(c)+'</b></td><td>T'+c.tier+'</td></tr>';});
+ h+='</table></div>';
+ const mx=Math.max.apply(null,rows.map(c=>score(c)||0));
+ h+='<div class="card"><h3>Priority score</h3><div class="mut sm">Taller bar = more questions historically.</div>';
+ rows.forEach(c=>{h+='<div class="hb"><span title="'+esc(c.name)+'">'+esc(c.name)+'</span>'+bar(mx?score(c)/mx*100:0,SUB[c.s].color)+'<span>'+score(c)+'</span></div>';});
+ h+='</div>';
+ const dmx=Math.max.apply(null,rows.map(c=>c.du));
+ h+='<div class="card"><h3>DU questions</h3>';rows.forEach(c=>{h+='<div class="hb"><span>'+esc(c.name)+'</span>'+bar(dmx?c.du/dmx*100:0,'var(--acc)')+'<span>'+c.du+'</span></div>';});h+='</div>';
+ let hot=[];
+ CHAPS.filter(c=>(p==='ALL'||c.p===p)).forEach(c=>c.topics.forEach(tp=>hot.push([tp[0],tp[1],c.name,tp[2]||''])));
+ hot.sort((a,b)=>b[1]-a[1]);if(p==='ALL')hot=hot.slice(0,15);
+ if(hot.length){const hm=hot[0][1];h+='<div class="card"><h3>High-frequency topics (question count)</h3>';hot.forEach(x=>{h+='<div class="hb" style="grid-template-columns:150px 1fr 56px"><span title="'+esc(x[0]+' — '+x[2])+'">'+esc(x[0])+'</span>'+bar(x[1]/hm*100,'var(--warn)')+'<span>'+x[1]+(x[3]?'<small> · '+x[3]+'</small>':'')+'</span></div>';});h+='</div>';}
+ else h+='<div class="card mut sm">Topic-level frequencies for this paper were not supplied, so none are shown.</div>';
+ return h;
+}
+function viewProgress(){
+ const ov=overall();let hrs=0,m=0,c=0,w=0,du=0;
+ DAYS.forEach(d=>{const a=actualOn(d);hrs+=a.hours;m+=a.m;c+=a.c;w+=a.w;du+=a.d;});
+ const rev=allT().filter(t=>S.done[t.id]&&['revise','spaced','weak'].indexOf(t.kind)>=0).length;
+ const chDone=CHAPS.filter(x=>allT().some(t=>t.ch===x.id)&&statusOf(x.id)>=2).length;const chTot=CHAPS.filter(x=>allT().some(t=>t.ch===x.id)).length;
+ let h='<h2>Progress</h2><div class="card"><div class="grid4"><div class="stat"><span class="mut">Plan done</span><b>'+ov.pct+'%</b></div><div class="stat"><span class="mut">Hours studied</span><b>'+round1(hrs)+'</b></div><div class="stat"><span class="mut">Chapters ≥ theory</span><b>'+chDone+'/'+chTot+'</b></div><div class="stat"><span class="mut">Revision tasks</span><b>'+rev+'</b></div></div>'+bar(ov.pct)+'</div>';
+ h+='<div class="card"><h3>Questions</h3><div class="grid4"><div class="stat"><span class="mut">MCQs attempted</span><b>'+m+'</b></div><div class="stat"><span class="mut">MCQs correct</span><b>'+c+'</b></div><div class="stat"><span class="mut">Accuracy</span><b>'+(c&&m?Math.round(c/m*100)+'%':'—')+'</b></div><div class="stat"><span class="mut">Written · DU</span><b>'+w+' · '+du+'</b></div></div><p class="mut sm">Attempts come from your check-ins; if you leave them blank, from the targets of tasks you ticked. Correct answers only count when you enter them.</p></div>';
+ const mxh=Math.max(10,Math.max.apply(null,DAYS.map(d=>Math.max(dayStats(d).planned/60,actualOn(d).hours))));
+ h+='<div class="card"><h3>Daily hours</h3><div class="mut sm">Grey = planned, green = actual.</div><div class="chart">'+DAYS.map(d=>{const a=actualOn(d).hours,p=dayStats(d).planned/60;return '<div class="col" title="'+fmtS(d)+'"><div class="p" style="height:'+p/mxh*100+'%"></div><div class="a" style="height:'+a/mxh*100+'%"></div></div>';}).join('')+'</div><div class="lab">'+DAYS.map(d=>'<span>'+parse(d).getUTCDate()+'</span>').join('')+'</div></div>';
+ const wk=[['Week 1 (23–29 Nov)',0,6],['Week 2 (30 Nov–6 Dec)',7,13],['Week 3 (7–11 Dec)',14,18]];
+ h+='<div class="card"><h3>Weekly hours</h3>';
+ wk.forEach(x=>{let a=0,p=0;for(let i=x[1];i<=x[2];i++){a+=actualOn(DAYS[i]).hours;p+=dayStats(DAYS[i]).planned/60;}h+='<div class="hb" style="grid-template-columns:140px 1fr 70px"><span>'+x[0]+'</span>'+bar(p?a/p*100:0)+'<span>'+round1(a)+'/'+round1(p)+' h</span></div>';});h+='</div>';
+ h+='<div class="card"><h3>Subject completion</h3>';
+ ORDER.forEach(s=>{const ts=allT().filter(t=>subjOf(t)===s);const p=ts.reduce((a,t)=>a+t.mins,0),d=ts.filter(t=>S.done[t.id]).reduce((a,t)=>a+t.mins,0);const pc=p?Math.round(d/p*100):0;h+='<div class="hb" style="grid-template-columns:130px 1fr 44px"><span>'+SUB[s].label+'</span>'+bar(pc,SUB[s].color)+'<span>'+pc+'%</span></div>';});h+='</div>';
+ h+='<div class="card"><h3>Chapter status counts</h3>';
+ STAT.forEach((s,i)=>{const n=CHAPS.filter(x=>allT().some(t=>t.ch===x.id)&&statusOf(x.id)===i).length;h+='<div class="hb" style="grid-template-columns:170px 1fr 30px"><span>'+s+'</span>'+bar(chTot?n/chTot*100:0)+'<span>'+n+'</span></div>';});h+='</div>';
+ return h;
+}
+function viewErrors(){
+ const T=['Wrong question','Concept not understood','Forgot formula','Needs revision'];
+ let h='<h2>Error notebook</h2><div class="card"><label class="f">Chapter</label><select id="er_ch" data-draft="1">'+chOptions(dv('er_ch',''),true)+'</select>'+
+ '<label class="f">Type</label><select id="er_ty" data-draft="1">'+T.map(x=>'<option'+(dv('er_ty','')===x?' selected':'')+'>'+x+'</option>').join('')+'</select>'+
+ '<label class="f">What went wrong?</label><textarea id="er_tx" data-draft="1" placeholder="The question, the correct answer, and why you missed it">'+esc(dv('er_tx',''))+'</textarea>'+
+ '<div style="margin-top:10px"><button class="btn" data-act="adderr">Save error</button></div><p class="mut sm">Three or more unresolved errors in one chapter automatically add a repair session to your plan. Redo each error after 1, 3 and 7 days.</p></div>';
+ const f=UI.errFilter;
+ h+='<div style="display:flex;gap:6px">'+[['open','Unresolved'],['due','Due today'],['res','Resolved'],['all','All']].map(x=>'<button class="tab'+(f===x[0]?' on':'')+'" data-act="errf" data-f="'+x[0]+'">'+x[1]+'</button>').join('')+'</div>';
+ let list=S.errors.slice().reverse().filter(e=>f==='all'||(f==='open'&&!e.resolved)||(f==='res'&&e.resolved)||(f==='due'&&!e.resolved&&errDue(e)<=today()));
+ if(!list.length)h+='<div class="card mut">Nothing here yet. Log mistakes as you find them.</div>';
+ list.forEach(e=>{const c=CH[e.ch];const due=errDue(e);
+  h+='<div class="card err'+(e.resolved?' res':'')+'"><div class="chip">'+esc(e.type)+'</div>'+(c?'<span class="chip">'+esc(c.name)+'</span>':'')+'<span class="chip">'+fmtS(e.date)+'</span>'+(e.resolved?'<span class="chip good">Resolved</span>':'<span class="chip '+(due<=today()?'bad':'')+'">Redo '+(due<=today()?'due now':'on '+fmtS(due))+'</span>')+'<div style="margin:6px 0">'+esc(e.text)+'</div><div style="display:flex;gap:6px;flex-wrap:wrap">'+
+  (e.resolved?'<button class="btn ghost sm" data-act="reopen" data-id="'+e.id+'">Reopen</button>':'<button class="btn sm" data-act="reviewed" data-id="'+e.id+'">Redone ✓ ('+(e.rev||0)+')</button><button class="btn ghost sm" data-act="resolve" data-id="'+e.id+'">Mark resolved</button>')+'<button class="btn ghost sm" data-act="delerr" data-id="'+e.id+'">Delete</button></div></div>';});
+ return h;
+}
+function viewMocks(){
+ let h='<h2>Mock tests</h2><div class="card"><div class="two"><div><label class="f">Date</label><input type="date" id="mk_d" data-draft="1" value="'+esc(dv('mk_d',today()))+'"></div><div><label class="f">Type</label><select id="mk_t" data-draft="1">'+['Full mock','Sectional','Mini-mock','Chapter test'].map(x=>'<option'+(dv('mk_t','')===x?' selected':'')+'>'+x+'</option>').join('')+'</select></div></div>'+
+ '<label class="f">Subject</label><select id="mk_s" data-draft="1">'+['All subjects','Physics','Chemistry','Biology','Higher Math'].map(x=>'<option'+(dv('mk_s','')===x?' selected':'')+'>'+x+'</option>').join('')+'</select>'+
+ '<div class="three"><div><label class="f">Total Qs</label><input id="mk_n" data-draft="1" inputmode="numeric" value="'+esc(dv('mk_n',''))+'"></div><div><label class="f">Correct</label><input id="mk_c" data-draft="1" inputmode="numeric" value="'+esc(dv('mk_c',''))+'"></div><div><label class="f">Incorrect</label><input id="mk_w" data-draft="1" inputmode="numeric" value="'+esc(dv('mk_w',''))+'"></div></div>'+
+ '<label class="f">Weakest chapter 1</label><select id="mk_w1" data-draft="1">'+chOptions(dv('mk_w1',''),true)+'</select><label class="f">Weakest chapter 2</label><select id="mk_w2" data-draft="1">'+chOptions(dv('mk_w2',''),true)+'</select>'+
+ '<label class="f">Topics to improve</label><textarea id="mk_x" data-draft="1">'+esc(dv('mk_x',''))+'</textarea><div style="margin-top:10px"><button class="btn" data-act="addmock">Save result</button></div><p class="mut sm">Score = correct − 0.25 × incorrect. Chapters you flag here get extra repair time automatically.</p></div>';
+ const ms=S.mocks.slice().sort((a,b)=>a.date<b.date?1:-1);
+ if(!ms.length)h+='<div class="card mut">No mocks logged yet. Planned: 29 Nov (mini), 3 Dec (sectional), 6 Dec, 8 Dec and 10 Dec (full).</div>';
+ if(ms.length>1){const mx=Math.max.apply(null,ms.map(m=>m.score))||1;h+='<div class="card"><h3>Score trend</h3>'+ms.slice().reverse().map(m=>'<div class="hb" style="grid-template-columns:100px 1fr 50px"><span>'+fmtS(m.date)+' '+esc(m.type)+'</span>'+bar(Math.max(0,m.score)/mx*100)+'<span>'+m.score+'</span></div>').join('')+'</div>';}
+ ms.forEach(m=>{h+='<div class="card"><div class="row"><div><b>'+fmt(m.date)+' — '+esc(m.type)+'</b><div class="mut sm">'+esc(m.subj)+'</div></div><div style="text-align:right"><b>'+m.score+'</b><div class="mut sm">'+m.acc+'% accuracy</div></div></div><div class="mut sm">'+m.total+' Qs · '+m.correct+' correct · '+m.wrong+' wrong · '+m.skipped+' skipped</div>'+
+  ((m.weak1||m.weak2)?'<div style="margin-top:4px">'+[m.weak1,m.weak2].filter(Boolean).map(x=>'<span class="chip bad">'+esc(CH[x]?CH[x].name:x)+'</span>').join('')+'</div>':'')+(m.note?'<div class="sm" style="margin-top:4px">'+esc(m.note)+'</div>':'')+'<button class="btn ghost sm" style="margin-top:6px" data-act="delmock" data-id="'+m.id+'">Delete</button></div>';});
+ return h;
+}
+function viewMore(){
+ const pf=perf();
+ let h='<h2>Strategy & settings</h2>';
+ h+='<div class="card"><h3>How the coach works</h3><ul class="t sm"><li>Every day is pre-assigned. Tick tasks as you finish them.</li><li>At the end of the day, save the check-in. Unfinished Learn and Revise tasks move to the next day with free space, highest priority first. At most 90 minutes of carry-over lands on any day.</li><li>Optional and flex tasks are dropped first to make room. Low-priority chapters (Tier 3–4) are postponed, never piled up.</li><li>A task missed twice is split into two shorter parts.</li><li>Three or more unresolved errors (or a chapter flagged in a mock) add a 30-minute repair task.</li><li>Two days under 65% complete switch on Lite mode. Two full days switch on Push mode.</li><li>Sleep is never traded for hours: every day is capped at about 8 h of tasks.</li></ul><p class="sm">Current mode: <b>'+pf.mode+'</b>'+(pf.why?' ('+pf.why+')':'')+'</p></div>';
+ h+='<details class="card"><summary>Tier system (by paper)</summary><div class="sm">'+Object.keys(PAPERS).map(k=>{const cs=CHAPS.filter(c=>c.p===k);return '<p><b>'+PAPERS[k][1]+(k[0]==='B'?' (DU-based)':'')+'</b><br>'+[1,2,3,4].map(t=>'T'+t+': '+(cs.filter(c=>c.tier===t).map(c=>c.name).join(', ')||'—')).join('<br>')+'</p>';}).join('')+'</div></details>';
+ h+='<details class="card"><summary>Organic Chemistry crash plan</summary><div class="sm"><p>You will not watch all 31 lectures (about 60 hours). Budget about 17 hours of Organic across the 19 days and watch only the lectures matching this order at 1.5×, skipping derivations: IUPAC and hybridisation → isomerism (63) → electronic effects → alkanes/alkenes/alkynes (62) → aromatics (59) → alkyl halides, alcohols, phenols → carbonyl (71) → acids & amines (57) → conversions.</p><p><b>Skip unless time remains:</b> R/S stereochemistry, polymers, biomolecules.</p><p><b>Method:</b> one card per reaction (reagent → product → condition). MCQs test ordering, naming, products and distinguishing tests. Written questions are conversions and short mechanisms.</p></div></details>';
+ h+='<details class="card"><summary>Exam tactics</summary><ul class="t sm"><li>MCQ 60 marks / 45 min (45 s each). Written 40 marks / 45 min. Wrong MCQ = −0.25.</li><li>Blind guessing is not worth it (expected gain about +0.06). With two options eliminated it is about +0.37, so answer then.</li><li>First pass: certain answers. Second pass: eliminate. Skip the rest.</li><li>Written: about 1 minute per mark. Formula, substitution, units, one clean method.</li><li>Mocks: 29 Nov (mini), 3 Dec (sectional), 6, 8, 10 Dec (full). Review for 60–90 minutes after each.</li><li>Check the official circular for the exact subject mark split and whether your department needs Biology or Math.</li></ul></details>';
+ h+='<div class="card"><h3>Settings</h3><label class="f">Pretend today is (testing only; clear to use the real date)</label><input type="date" data-chg="override" value="'+esc(S.settings.override||'')+'">'+
+ '<label class="f">Coach mode</label><select data-chg="mode">'+[['auto','Automatic'],['lite','Lite'],['normal','Normal'],['push','Push']].map(x=>'<option value="'+x[0]+'"'+(S.settings.mode===x[0]?' selected':'')+'>'+x[1]+'</option>').join('')+'</select>'+
+ '<p class="mut sm">Saving: '+(Store.ok?'<b>on</b> (this browser)':'<b>off</b> in this preview. Open the downloaded file in Chrome.')+'</p></div>';
+ h+='<div class="card"><h3>Backup</h3><p class="sm mut">Copy this text somewhere safe. To restore, paste it into the box and tap Import.</p><textarea id="bk" data-draft="1" style="min-height:90px">'+esc(dv('bk',JSON.stringify(S)))+'</textarea><div style="display:flex;gap:8px;margin-top:8px"><button class="btn ghost sm" data-act="bksel">Select all</button><button class="btn sm" data-act="bkimp">Import</button></div></div>';
+ h+='<div class="card"><h3>Reset</h3>'+(UI.resetOpen?'<p class="sm">Type RESET to erase all progress, errors and mocks.</p><input id="rs" data-draft="1" value="'+esc(dv('rs',''))+'"><div style="display:flex;gap:8px;margin-top:8px"><button class="btn bad sm" data-act="reset">Erase everything</button><button class="btn ghost sm" data-act="resetx">Cancel</button></div>':'<button class="btn bad sm" data-act="resetq">Reset all progress…</button>')+'</div>';
+ return h;
+}
+/* ================= RENDER ================= */
+const TABS=[['today','Today'],['plan','Plan'],['chapters','Chapters'],['analysis','Analysis'],['progress','Progress'],['errors','Errors'],['mocks','Mocks'],['more','More']];
+function render(){
+ const y=window.pageYOffset||0;
+ let body='';
+ try{body={today:viewToday,plan:viewPlan,chapters:viewChapters,analysis:viewAnalysis,progress:viewProgress,errors:viewErrors,mocks:viewMocks,more:viewMore}[UI.tab]();}catch(e){body='<div class="card coach warn"><b>Display error.</b><p class="sm">'+esc(e&&e.message)+'</p></div>';}
+ const flash=UI.flash?'<div class="card coach"><p>'+esc(UI.flash)+'</p></div>':'';UI.flash='';
+ document.getElementById('app').innerHTML='<div class="tabs">'+TABS.map(x=>'<button class="tab'+(UI.tab===x[0]?' on':'')+'" data-act="tab" data-t="'+x[0]+'">'+x[1]+'</button>').join('')+'</div>'+flash+body;
+ window.scrollTo(0,y);
+}
+/* ================= EVENTS ================= */
+const num=id=>{const v=UI.draft[id];return v===undefined||v===''?null:+v;};
+const A={
+ tab(el){UI.tab=el.dataset.t;window.scrollTo(0,0);render();},
+ selday(el){UI.planSel=el.dataset.d;render();},
+ chf(el){UI.chFilter=el.dataset.s;render();},
+ errf(el){UI.errFilter=el.dataset.f;render();},
+ asort(el){const k=el.dataset.k;if(UI.aSort===k)UI.aDir*=-1;else{UI.aSort=k;UI.aDir=k==='name'||k==='tier'?1:-1;}render();},
+ restore(el){delete S.dropped[el.dataset.id];delete S.dropInfo[el.dataset.id];save();render();},
+ checkin(){
+  const t=today(),st=dayStats(curDay()),g=id=>UI.draft[id]!==undefined?UI.draft[id]:(S.checkins[t]&&S.checkins[t][{ci_h:'hours',ci_m:'m',ci_c:'c',ci_w:'w',ci_d:'d',ci_hard:'hard'}[id]]);
+  S.checkins[t]={hours:g('ci_h'),m:g('ci_m'),c:g('ci_c'),w:g('ci_w'),d:g('ci_d'),hard:g('ci_hard')||'',submitted:true,plan:st.planned,doneMin:st.doneMin};
+  ['ci_h','ci_m','ci_c','ci_w','ci_d','ci_hard'].forEach(k=>delete UI.draft[k]);
+  const m=runAdjust(true);UI.flash='Check-in saved. '+(m.length?m.length+' change'+(m.length===1?'':'s')+' made to your upcoming plan.':'Your plan is unchanged.');render();
+ },
+ adderr(){
+  const tx=(UI.draft.er_tx||'').trim();if(!tx){UI.flash='Write what went wrong before saving.';render();return;}
+  S.errors.push({id:'e'+Date.now(),date:today(),ch:UI.draft.er_ch||'',type:UI.draft.er_ty||'Wrong question',text:tx,resolved:false,rev:0,last:null});
+  delete UI.draft.er_tx;runAdjust(false);UI.flash='Error saved.';render();
+ },
+ reviewed(el){const e=S.errors.find(x=>x.id===el.dataset.id);if(e){e.rev=(e.rev||0)+1;e.last=today();if(e.rev>=3){e.resolved=true;UI.flash='Redone three times. Marked resolved.';}}save();render();},
+ resolve(el){const e=S.errors.find(x=>x.id===el.dataset.id);if(e)e.resolved=true;save();render();},
+ reopen(el){const e=S.errors.find(x=>x.id===el.dataset.id);if(e){e.resolved=false;e.rev=0;}save();render();},
+ delerr(el){S.errors=S.errors.filter(x=>x.id!==el.dataset.id);save();render();},
+ addmock(){
+  const n=num('mk_n'),c=num('mk_c'),w=num('mk_w');
+  if(n==null||c==null||w==null||c+w>n){UI.flash='Enter total, correct and incorrect. Correct + incorrect cannot exceed the total.';render();return;}
+  S.mocks.push({id:'m'+Date.now(),date:UI.draft.mk_d||today(),type:UI.draft.mk_t||'Full mock',subj:UI.draft.mk_s||'All subjects',total:n,correct:c,wrong:w,skipped:n-c-w,score:Math.round((c-0.25*w)*100)/100,acc:(c+w)?Math.round(c/(c+w)*100):0,weak1:UI.draft.mk_w1||'',weak2:UI.draft.mk_w2||'',note:UI.draft.mk_x||''});
+  ['mk_n','mk_c','mk_w','mk_x','mk_w1','mk_w2'].forEach(k=>delete UI.draft[k]);
+  runAdjust(false);UI.flash='Mock saved.';render();
+ },
+ delmock(el){S.mocks=S.mocks.filter(x=>x.id!==el.dataset.id);save();render();},
+ bksel(){const b=document.getElementById('bk');if(b){b.focus();b.select();}},
+ bkimp(){try{const o=JSON.parse(UI.draft.bk||'');if(!o||typeof o!=='object'||!o.done)throw new Error('bad');S=Object.assign(defaults(),o);S.settings=Object.assign({override:'',mode:'auto'},S.settings||{});delete UI.draft.bk;save();UI.flash='Backup imported.';}catch(e){UI.flash='That backup text could not be read. Paste the full text and try again.';}render();},
+ resetq(){UI.resetOpen=true;render();},
+ resetx(){UI.resetOpen=false;delete UI.draft.rs;render();},
+ reset(){if((UI.draft.rs||'').trim()==='RESET'){S=defaults();UI.draft={};UI.resetOpen=false;save();UI.flash='Everything has been reset.';}else UI.flash='Type RESET exactly to confirm.';render();}
+};
+const C={
+ toggle(el){const id=el.dataset.id;if(el.checked)S.done[id]=today();else delete S.done[id];save();render();},
+ chstatus(el){S.chStatus[el.dataset.id]=el.value;save();render();},
+ apaper(el){UI.aPaper=el.value;UI.aSort='score';UI.aDir=-1;render();},
+ override(el){S.settings.override=el.value||'';runAdjust(false);render();},
+ mode(el){S.settings.mode=el.value;runAdjust(false);render();}
+};
+document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if(el&&A[el.dataset.act])A[el.dataset.act](el,e);});
+document.addEventListener('change',e=>{const el=e.target.closest('[data-chg]');if(el&&C[el.dataset.chg])C[el.dataset.chg](el,e);else if(e.target.dataset&&e.target.dataset.draft){UI.draft[e.target.id]=e.target.value;}});
+document.addEventListener('input',e=>{const el=e.target;if(el&&el.dataset&&el.dataset.draft)UI.draft[el.id]=el.value;});
+/* ================= INIT ================= */
+runAdjust(false);
+render();
+window.__app={S:function(){return S;},UI:UI,render:render,TASKS:TASKS,A:A,C:C,views:{viewToday,viewPlan,viewChapters,viewAnalysis,viewProgress,viewErrors,viewMocks,viewMore},rebalance:rebalance,runAdjust:runAdjust,dayStats:dayStats,DAYS:DAYS};
+})();
+</script>
+</body>
+</html>
